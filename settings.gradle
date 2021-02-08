@@ -1,1 +1,8 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+    }
+}
 rootProject.name = 'gabia-library'
+include 'spring-cloud:api-gateway'
+include 'microservices:user-service'

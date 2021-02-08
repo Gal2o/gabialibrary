@@ -1,13 +1,13 @@
-package com.galib;
+package gabia.library;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class GabiaLibraryApplication {
+public class UserServiceApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(GabiaLibraryApplication.class, args);
+        SpringApplication.run(UserServiceApplication.class, args);
     }
 
 }
