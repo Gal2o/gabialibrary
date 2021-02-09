@@ -3,7 +3,7 @@ plugins {
     id 'java'
 }
 
-group = 'com.gabic.library'
+group = 'com.gabia.library'
 sourceCompatibility = '1.8'
 
 repositories {
