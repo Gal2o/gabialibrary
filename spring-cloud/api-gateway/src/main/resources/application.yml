@@ -1,3 +1,12 @@
 spring:
   application:
     name: api-gateway
+
+server:
+  port: 8762
+
+zuul:
+  routes:
+    user-service:
+      path: /api/users/**
+      url: http://127.0.0.1:8080/
