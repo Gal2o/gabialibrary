@@ -5,6 +5,8 @@ pluginManagement {
 }
 rootProject.name = 'gabia-library'
 include 'spring-cloud:api-gateway'
+include 'spring-cloud:discovery-server'
 include 'microservices:user-service'
 include 'microservices:auth-service'
+
 
