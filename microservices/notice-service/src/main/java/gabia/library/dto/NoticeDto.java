@@ -14,17 +14,17 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class NoticeDto {
 
-    @JsonView(NoticeJsonView.Default.class)
+    @JsonView(NoticeJsonView.Modify.class)
     private Long id;
 
-    @JsonView(NoticeJsonView.Default.class)
+    @JsonView(NoticeJsonView.Modify.class)
     private String title;
 
-    @JsonView(NoticeJsonView.Default.class)
+    @JsonView(NoticeJsonView.Modify.class)
     private String content;
 
     @Column(name = "is_important")
-    @JsonView(NoticeJsonView.Default.class)
+    @JsonView(NoticeJsonView.Modify.class)
     private boolean isImportant;
 
     @Column(name = "is_deleted")

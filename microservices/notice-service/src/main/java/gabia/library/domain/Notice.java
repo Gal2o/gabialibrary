@@ -1,7 +1,6 @@
 package gabia.library.domain;
 
-import com.fasterxml.jackson.annotation.JsonView;
-import gabia.library.config.NoticeJsonView;
+import gabia.library.dto.NoticeDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -51,9 +50,9 @@ public class Notice {
         this.isImportant = isImportant;
     }
 
-    public void updateNotice(String title, String content, boolean isImportant){
-        this.title = title;
-        this.content = content;
-        this.isImportant = isImportant;
+    public void updateNotice(NoticeDto noticeDto){
+        this.title = noticeDto.getTitle();
+        this.content = noticeDto.getContent();
+        this.isImportant = noticeDto.isImportant();
     }
 }

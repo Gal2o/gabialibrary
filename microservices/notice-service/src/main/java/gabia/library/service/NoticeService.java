@@ -1,5 +1,6 @@
 package gabia.library.service;
 
+import com.sun.org.apache.xpath.internal.operations.Mod;
 import gabia.library.domain.Notice;
 import gabia.library.domain.NoticeRespository;
 import gabia.library.dto.NoticeDto;
@@ -10,16 +11,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
 public class NoticeService {
 
     private final NoticeRespository noticeRespository;
+    private final ModelMapper modelMapper;
 
     public NoticeDto addNotice(NoticeDto noticeDto){
-        ModelMapper modelMapper = new ModelMapper();
-
         Notice notice = noticeRespository.save(Notice.builder()
                 .title(noticeDto.getTitle())
                 .content(noticeDto.getContent())
@@ -30,23 +31,15 @@ public class NoticeService {
     }
 
     public List<NoticeDto> findAll(){
-        List<Notice> notices = noticeRespository.findAll();
-        List<NoticeDto> result = new ArrayList<>();
-        ModelMapper modelMapper = new ModelMapper();
-
-        for(Notice n : notices){
-            NoticeDto noticeDto = modelMapper.map(n, NoticeDto.class);
-            result.add(noticeDto);
-        }
-
-        return result;
+        return noticeRespository.findAll()
+                .stream()
+                .map(notice -> modelMapper.map(notice, NoticeDto.class))
+                .collect(Collectors.toList());
     }
 
     public NoticeDto findNotice(Long id){
         Notice notice = noticeRespository.findById(id)
                 .orElseThrow(() -> new IllegalStateException("존재하지 않는 글입니다."));
-
-        ModelMapper modelMapper = new ModelMapper();
 
         return modelMapper.map(notice, NoticeDto.class);
     }
@@ -56,9 +49,7 @@ public class NoticeService {
         Notice notice = noticeRespository.findById(noticeDto.getId())
                 .orElseThrow(() -> new IllegalStateException("존재하지 않는 글입니다."));
 
-        notice.updateNotice(noticeDto.getTitle(), noticeDto.getContent(), noticeDto.isImportant());
-
-        ModelMapper modelMapper = new ModelMapper();
+        notice.updateNotice(noticeDto);
 
         return modelMapper.map(notice, NoticeDto.class);
     }
@@ -68,8 +59,6 @@ public class NoticeService {
                 .orElseThrow(() -> new IllegalStateException("존재하지 않는 글입니다."));
 
         noticeRespository.deleteById(id);
-
-        ModelMapper modelMapper = new ModelMapper();
 
         return modelMapper.map(notice, NoticeDto.class);
     }
