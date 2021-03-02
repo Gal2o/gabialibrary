@@ -1,7 +1,9 @@
 package gabia.library.config;
 
 import gabia.library.filter.JwtAuthenticationFilter;
+import gabia.library.utils.jwt.JwtUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -18,13 +20,26 @@ import static org.springframework.http.HttpMethod.POST;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final JwtConfig jwtConfig;
+    private final JwtUtils jwtUtils;
 
+    private static final String[] SWAGGER_AUTH_WHITELIST = {
+            "/swagger-resources/**",
+            "/swagger-ui.html",
+            "/v2/api-docs",
+            "/webjars/**",
+            "/swagger-ui/**",
+            "/user-service/v2/api-docs",
+            "/book-service/v2/api-docs"
+    };
 
     @Override
     public void configure(WebSecurity web) throws Exception {
         web
                 .ignoring()
-                .antMatchers(POST, "/auth-service/auth/**");
+                .antMatchers(POST, "/auth-service/auth/**")
+                .antMatchers(HttpMethod.POST, "/user-service/users")
+                .antMatchers(HttpMethod.GET, "/book-service/books/**")
+                .antMatchers(SWAGGER_AUTH_WHITELIST);
     }
 
     @Override
@@ -36,12 +51,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling()
                 .authenticationEntryPoint((request, response, authException) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED))
                 .and()
-                .addFilterBefore(new JwtAuthenticationFilter(jwtConfig), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthenticationFilter(jwtConfig, jwtUtils), UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                .antMatchers(POST, jwtConfig.getUri()).permitAll()
-                .antMatchers(POST, "/api/user-service/users").permitAll()
-                .antMatchers(POST, "/api/user-service/admin").permitAll()
-                .antMatchers("/admin-test").hasRole("ADMIN")
+                .antMatchers(HttpMethod.POST, "/book-service/books").hasRole("USER")
+                .antMatchers(HttpMethod.GET,"/user-service/admin").hasRole("ADMIN")
                 .anyRequest().authenticated();
     }
 }
