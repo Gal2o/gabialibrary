@@ -1,6 +1,5 @@
 package gabia.library.service;
 
-import com.sun.org.apache.xpath.internal.operations.Mod;
 import gabia.library.domain.Notice;
 import gabia.library.domain.NoticeRespository;
 import gabia.library.dto.NoticeDto;
@@ -9,7 +8,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 

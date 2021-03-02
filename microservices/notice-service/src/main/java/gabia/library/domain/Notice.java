@@ -1,5 +1,6 @@
 package gabia.library.domain;
 
+import gabia.library.config.BaseTimeEntity;
 import gabia.library.dto.NoticeDto;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,9 +16,8 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor
 @Getter
-@Setter
 @Entity
-public class Notice {
+public class Notice extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,14 +34,6 @@ public class Notice {
 
     @Column(name = "is_deleted", columnDefinition = "boolean default false")
     private boolean isDeleted;
-
-    @CreatedDate
-    @Column(name = "created_date")
-    private LocalDateTime createDate;
-
-    @LastModifiedDate
-    @Column(name = "updated_date")
-    private LocalDateTime updatedDate;
 
     @Builder
     public Notice(String title, String content, boolean isImportant){

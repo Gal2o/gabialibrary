@@ -32,7 +32,7 @@ public class NoticeDto {
 
     @Column(name = "created_date")
     @JsonView(NoticeJsonView.Default.class)
-    private LocalDateTime createDate;
+    private LocalDateTime createdDate;
 
     @Column(name = "updated_date")
     private LocalDateTime updatedDate;
