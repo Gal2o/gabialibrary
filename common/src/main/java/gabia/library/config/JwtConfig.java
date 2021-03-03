@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
  * This is a common class related to jwt settings.
  */
 
-
 @ToString
 @Getter
 @Component

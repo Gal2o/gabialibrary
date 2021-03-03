@@ -14,7 +14,7 @@ import java.util.Optional;
 
 /**
  * @author Wade
- * This is a common class related to jwt settings.
+ * This is a common jwt utils class associated with a jwt.
  */
 
 @RequiredArgsConstructor

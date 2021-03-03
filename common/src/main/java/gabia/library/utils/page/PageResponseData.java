@@ -7,7 +7,6 @@ import lombok.Getter;
  * This is a common page response data.
  */
 
-// TODO: 공통코드로 뺄 코드
 @Getter
 public class PageResponseData {
 
