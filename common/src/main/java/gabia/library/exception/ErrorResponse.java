@@ -8,6 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * @author Wade
+ * This class is common class returned when exception occurs.
+ */
+
 @Getter
 @NoArgsConstructor
 public class ErrorResponse {

@@ -8,6 +8,11 @@ import org.springframework.stereotype.Component;
 
 import static java.util.Objects.isNull;
 
+/**
+ * @author Wade
+ * This is a common page utils class associated with a page.
+ */
+
 @Component
 public class PageUtils {
 

@@ -15,36 +15,41 @@ import java.nio.file.AccessDeniedException;
 
 import static gabia.library.exception.message.CommonExceptionMessage.*;
 
+/**
+ * @author Wade
+ * This is a handler that handles exceptions that occur in the entire API.
+ */
+
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     /**
-     * javax.validation.Valid or @Validated binding 예외 처리 handler
+     * javax.validation.Valid or @Validated binding exception handler
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     protected ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        log.error("handleMethodArgumentNotValidException", e);
+        log.info("handleMethodArgumentNotValidException", e);
 
         return new ResponseEntity<>(ErrorResponse.of(INVALID_INPUT_VALUE, e.getBindingResult()), HttpStatus.BAD_REQUEST);
     }
 
     /**
-     * 지원하지 않은 HTTP method 호출 할 경우 예외 처리 handler
+     * Exception handling handler for unsupported HTTP method calls
      */
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     protected ResponseEntity<ErrorResponse> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
-        log.error("handleHttpRequestMethodNotSupportedException", e);
+        log.info("handleHttpRequestMethodNotSupportedException", e);
 
         return new ResponseEntity<>(ErrorResponse.of(METHOD_NOT_ALLOWED), HttpStatus.METHOD_NOT_ALLOWED);
     }
 
     /**
-     * Authentication 예외 처리 handler
+     * Exception handling handler for Authentication exception
      */
     @ExceptionHandler(AccessDeniedException.class)
     protected ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException e) {
-        log.error("handleAccessDeniedException", e);
+        log.info("handleAccessDeniedException", e);
 
         return new ResponseEntity<>(ErrorResponse.of(HANDLE_ACCESS_DENIED), HttpStatus.UNAUTHORIZED);
     }
@@ -54,17 +59,17 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     protected ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
-        log.error("handleMethodArgumentTypeMismatchException", e);
+        log.info("handleMethodArgumentTypeMismatchException", e);
 
         return new ResponseEntity<>(ErrorResponse.of(HANDLE_METHOD_ARGUMENT_TYPE_MISMATCH), HttpStatus.BAD_REQUEST);
     }
 
     /**
-     * business 예외 처리 handler
+     * Handlers that handle the exception that occurs during business logic processing
      */
     @ExceptionHandler(BusinessException.class)
     protected ResponseEntity<ErrorResponse> handleBusinessException(final BusinessException e) {
-        log.error("handleBusinessException", e);
+        log.info("handleBusinessException", e);
 
         return new ResponseEntity<>(ErrorResponse.of(e.getErrorMessage()), HttpStatus.BAD_REQUEST);
     }
@@ -79,3 +84,4 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(ErrorResponse.of(INTERNAL_SERVER_ERROR), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
+

@@ -1,5 +1,10 @@
 package gabia.library.exception;
 
+/**
+ * @author Wade
+ * This class is that manages a business exception.
+ */
+
 public class BusinessException extends RuntimeException {
 
     private final String errorMessage;

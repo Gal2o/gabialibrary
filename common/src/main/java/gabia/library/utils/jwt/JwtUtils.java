@@ -12,6 +12,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * @author Wade
+ * This is a common class related to jwt settings.
+ */
+
 @RequiredArgsConstructor
 @Service
 public class JwtUtils {
