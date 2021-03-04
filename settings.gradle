@@ -7,6 +7,5 @@ rootProject.name = 'gabia-library'
 include 'spring-cloud:api-gateway'
 include 'spring-cloud:discovery-server'
 include 'microservices:auth-service'
-include 'microservices:user-service'
-include 'microservices:book-service'
+include 'microservices:notice-service'
 
