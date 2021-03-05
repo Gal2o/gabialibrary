@@ -2,6 +2,7 @@ package gabia.library.config;
 
 import gabia.library.filter.JwtAuthenticationFilter;
 import gabia.library.utils.jwt.JwtUtils;
+import gabia.library.utils.role.AuthRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -53,8 +54,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .addFilterBefore(new JwtAuthenticationFilter(jwtConfig, jwtUtils), UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/book-service/books").hasRole("USER")
-                .antMatchers(HttpMethod.GET,"/user-service/admin").hasRole("ADMIN")
+                .antMatchers(HttpMethod.POST, "/book-service/books").hasRole(AuthRole.USER.getAuthority())
+                .antMatchers(HttpMethod.GET,"/user-service/admin").hasRole(AuthRole.ADMIN.getAuthority())
                 .anyRequest().authenticated();
     }
 }
