@@ -67,6 +67,9 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
 
         // return jwt in response header
         response.addHeader(jwtConfig.getHeader(), jwtConfig.getPrefix() + " " + makeJwtWithAuthentication(authentication));
+
+        response.addHeader("authority", authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority).collect(Collectors.toList()).toString());
     }
 
     @Override

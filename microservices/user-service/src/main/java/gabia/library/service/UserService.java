@@ -86,4 +86,11 @@ public class UserService {
 
         return modelMapper.map(user, UserDto.class);
     }
+
+    public UserDto Login(String identifier){
+        User authuser = userRepository.findByIdentifier(identifier)
+                .orElseThrow(() -> new IllegalStateException("존재하지 않는 회원입니다."));
+
+        return modelMapper.map(authuser, UserDto.class);
+    }
 }
