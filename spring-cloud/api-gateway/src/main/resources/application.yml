@@ -1,25 +1,44 @@
+server:
+  port: 8001
+
 spring:
   application:
     name: api-gateway
-
-server:
-  port: 8762
 
 zuul:
   routes:
     auth-service:
       path: /auth/**
-      url: http://127.0.0.1:9100/
+      serviceId: auth-service
       sensitiveHeaders: Cookie, Set-Cookie
-      stripPrefix: false
     user-service:
-      path: /api/user-service/**
-      url: http://127.0.0.1:8081/
+      path: /users/**
+      serviceId: user-service
+    book-service:
+      path: /books/**
+      serviceId: book-service
+    review-service:
+      path: /reviews/**
+      serviceId: review-service
+
+ribbon:
+  ReadTimeout: 60000
+  connection-timeout: 3000
+  eureka:
+    enabled: true
+
+eureka:
+  instance:
+    non-secure-port: ${server.port}
+    prefer-ip-address: true
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8000/eureka/
+
 security:
   jwt:
     uri: /auth/**
-    header: Authorization
+    header: Token
     prefix: Bearer
     expiration: 86400 # 24*60*60
     secret: JwtSecretKey
-
