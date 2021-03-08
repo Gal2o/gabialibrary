@@ -5,6 +5,11 @@ import lombok.ToString;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+/**
+ * @author Wade
+ * This is a common class related to jwt settings.
+ */
+
 @ToString
 @Getter
 @Component

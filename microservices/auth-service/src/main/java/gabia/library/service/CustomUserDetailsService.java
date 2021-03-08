@@ -21,7 +21,7 @@ import static java.util.Objects.isNull;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final static String GET_AUTH_USER_URL = "http://localhost:8081/login?identifier=";      // TODO: 추후에 동적 URL로 변경하기
+    private final static String GET_AUTH_USER_URL = "http://user-service/users?identifier=";
 
     private final RestTemplate restTemplate;
 
