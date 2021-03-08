@@ -30,7 +30,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/webjars/**",
             "/swagger-ui/**",
             "/user-service/v2/api-docs",
-            "/book-service/v2/api-docs"
+            "/book-service/v2/api-docs",
+            "/review-service/v2/api-docs"
     };
 
     @Override
@@ -40,6 +41,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(POST, "/auth-service/auth/**")
                 .antMatchers(HttpMethod.POST, "/user-service/users")
                 .antMatchers(HttpMethod.GET, "/book-service/books/**")
+                .antMatchers(HttpMethod.GET, "/review-service/books/reviews/**")
+                .antMatchers(HttpMethod.GET, "/review-service/books/**/reviews")
                 .antMatchers(SWAGGER_AUTH_WHITELIST);
     }
 
