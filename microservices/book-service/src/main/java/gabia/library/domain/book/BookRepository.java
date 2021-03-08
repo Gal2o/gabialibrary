@@ -1,4 +1,4 @@
-package gabia.library.domain;
+package gabia.library.domain.book;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

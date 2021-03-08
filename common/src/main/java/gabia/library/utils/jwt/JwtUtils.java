@@ -4,7 +4,9 @@ import gabia.library.config.JwtConfig;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.nio.file.AccessDeniedException;
@@ -18,20 +20,10 @@ import java.util.Optional;
  */
 
 @RequiredArgsConstructor
-@Service
+@Component
 public class JwtUtils {
 
     private final JwtConfig jwtConfig;
-
-    public String getJwtFromRequest(HttpServletRequest request) throws AccessDeniedException {
-        String token = request.getHeader(jwtConfig.getHeader());
-
-        if(isUnValidHeader(token)) {
-            throw new AccessDeniedException("유효하지 않은 토큰입니다.");
-        }
-
-        return getPureJwtInHeader(token);
-    }
 
     public boolean isUnValidHeader(String header) {
         return Optional.ofNullable(header)
@@ -50,10 +42,6 @@ public class JwtUtils {
                 .getBody();
     }
 
-    public String getIdentifierFromJwt(String jwt) {
-        return getSubjectFromJwt(jwt);
-    }
-
     public String getSubjectFromJwt(String jwt) {
         return Jwts.parser()                                                                // check expired time
                 .setSigningKey(jwtConfig.getSecret().getBytes())
@@ -68,4 +56,27 @@ public class JwtUtils {
 
         return Arrays.asList(authoritiesStr.split(","));
     }
+
+    public String getJwtFromRequest(HttpServletRequest request) throws AccessDeniedException {
+        String token = request.getHeader(jwtConfig.getHeader());
+
+        if(isUnValidHeader(token)) {
+            throw new AccessDeniedException("유효하지 않은 토큰입니다.");
+        }
+
+        return getPureJwtInHeader(token);
+    }
+
+    public String getIdentifierFromJwt(String jwt) {
+        return getSubjectFromJwt(jwt);
+    }
+
+    public HttpHeaders getHttpHeadersIncludedJwt(String jwt) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set(jwtConfig.getHeader(), jwtConfig.getPrefix() + " " + jwt);
+
+        return headers;
+    }
+
 }

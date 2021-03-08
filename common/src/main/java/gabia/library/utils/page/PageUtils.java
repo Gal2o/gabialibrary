@@ -6,6 +6,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 import static java.util.Objects.isNull;
 
 /**
@@ -15,6 +17,8 @@ import static java.util.Objects.isNull;
 
 @Component
 public class PageUtils {
+
+    private static final int MIN_PAGE_VAL = 1;
 
     public int getRealPage(Integer page) {
         return isNull(page) ? 0 : page - 1;
@@ -30,6 +34,19 @@ public class PageUtils {
         pageResponseData.setPagingInfo(pageList.getNumber(), pageList.getTotalPages(), scaleSize);
 
         return pageResponseData;
+    }
+
+    public boolean isInvalidPageValue(Integer page) {
+        return !isNull(page) && page < MIN_PAGE_VAL;
+    }
+
+
+    public PagingResponseDto getCommonPagingResponseDto(Page<?> pageList, List<?> responseDtoList, int scaleSize) {
+
+        return PagingResponseDto.builder()
+                .responseDtoList(responseDtoList)
+                .pageResponseData(getPageResponseData(pageList, scaleSize))
+                .build();
     }
 
 }
