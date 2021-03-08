@@ -4,6 +4,7 @@ import gabia.library.filter.JwtAuthenticationFilter;
 import gabia.library.utils.jwt.JwtUtils;
 import gabia.library.utils.role.AuthRole;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
