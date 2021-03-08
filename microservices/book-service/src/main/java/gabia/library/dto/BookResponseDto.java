@@ -1,19 +1,20 @@
 package gabia.library.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Setter
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 public class BookResponseDto {
 
     private Long id;
+    private Long rentId;
     private String identifier;
     private String title;
     private String author;
@@ -28,6 +29,8 @@ public class BookResponseDto {
     private boolean isRent;
     private String etc;
     private Integer extensionCount;
+    private Integer avgReviewRating;
+    private Integer reviewCount;
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
     private LocalDate rentExpiredDate;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
