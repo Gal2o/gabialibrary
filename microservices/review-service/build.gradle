@@ -1,0 +1,31 @@
+version = '0.0.1-SNAPSHOT'
+
+ext['springCloudVersion'] = 'Hoxton.RELEASE'
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'gabia.library.ReviewServiceApplication'
+    }
+}
+
+dependencies {
+    compile project(':common')
+    compile('org.springframework.boot:spring-boot-starter-data-jpa')
+    compile('org.springframework.cloud:spring-cloud-starter-netflix-ribbon')
+    compile('org.springframework.retry:spring-retry:1.2.2.RELEASE')
+    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.6'
+    runtimeOnly 'com.h2database:h2'
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
