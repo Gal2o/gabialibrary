@@ -5,7 +5,9 @@ import gabia.library.domain.rent.RentStatus;
 import gabia.library.dto.BookRequestDto;
 import gabia.library.dto.ReviewRequestDto;
 import gabia.library.dto.ReviewResponseDto;
-import gabia.library.kafka.message.BookRentMessage;
+import gabia.library.kafka.BookRentMessage;
+import gabia.library.kafka.BookReturnMessage;
+import gabia.library.utils.alert.AlertType;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -169,15 +171,29 @@ public class Book {
         this.reviewCount--;
     }
 
-    public BookRentMessage toBookRentMessage(String rentIdentifier) {
+    public BookRentMessage toBookRentMessage(String rentIdentifier, String email) {
 
         return BookRentMessage.builder()
                 .bookId(this.getId())
                 .bookTitle(this.getTitle())
                 .bookAuthor(this.getAuthor())
                 .identifier(rentIdentifier)
+                .email(email)
                 .rentExpiredDate(LocalDate.now().plusMonths(1))
-                .bookAlertType(BookAlertType.RENT)
+                .alertType(AlertType.RENT)
+                .build();
+    }
+
+    public BookReturnMessage toBookReturnMessage(String returnIdentifier, String email) {
+
+        return BookReturnMessage.builder()
+                .bookId(this.getId())
+                .bookTitle(this.getTitle())
+                .bookAuthor(this.getAuthor())
+                .identifier(returnIdentifier)
+                .email(email)
+                .returnDateTime(LocalDateTime.now())
+                .alertType(AlertType.RETURN)
                 .build();
     }
 }

@@ -25,8 +25,8 @@ spring:
     stream:
       kafka:
         binder:
-          brokers: 3.36.56.172
-          zkNodes: 3.36.56.172
+          brokers: 3.35.229.19
+          zkNodes: 3.35.229.19
           defaultBrokerPort: 9092
           autoCreateTopics: false
       bindings:

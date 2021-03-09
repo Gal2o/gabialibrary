@@ -1,8 +1,8 @@
 package gabia.library.listener;
 
+import gabia.library.kafka.BookRentMessage;
 import gabia.library.kafka.channel.BookRentInputChannel;
 import gabia.library.kafka.consumer.BookRentConsumer;
-import gabia.library.kafka.message.BookRentMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.StreamListener;

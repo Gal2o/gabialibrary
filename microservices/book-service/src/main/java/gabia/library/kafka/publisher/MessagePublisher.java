@@ -1,9 +1,9 @@
 package gabia.library.kafka.publisher;
 
+import gabia.library.kafka.BookRentMessage;
+import gabia.library.kafka.BookReturnMessage;
 import gabia.library.kafka.channel.BookRentOutputChannel;
 import gabia.library.kafka.channel.BookReturnOutputChannel;
-import gabia.library.kafka.message.BookRentMessage;
-import gabia.library.kafka.message.BookReturnMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.stereotype.Component;

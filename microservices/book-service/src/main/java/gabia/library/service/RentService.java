@@ -1,16 +1,15 @@
 package gabia.library.service;
 
 import gabia.library.domain.book.Book;
-import gabia.library.domain.book.BookAlertType;
 import gabia.library.domain.book.BookRepository;
 import gabia.library.domain.rent.Rent;
 import gabia.library.domain.rent.RentRepository;
 import gabia.library.dto.BookResponseDto;
 import gabia.library.dto.RentResponseDto;
+import gabia.library.dto.UserEmailDto;
 import gabia.library.exception.*;
 import gabia.library.kafka.channel.BookRentOutputChannel;
 import gabia.library.kafka.channel.BookReturnOutputChannel;
-import gabia.library.kafka.message.BookReturnMessage;
 import gabia.library.kafka.publisher.MessagePublisher;
 import gabia.library.mapper.BookMapper;
 import gabia.library.mapper.RentMapper;
@@ -21,8 +20,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
 
 import static gabia.library.exception.message.BookExceptionMessage.*;
 import static gabia.library.exception.message.CommonExceptionMessage.ENTITY_NOT_FOUND;
+import static java.util.Objects.isNull;
 
 @EnableBinding({BookRentOutputChannel.class, BookReturnOutputChannel.class})
 @Slf4j
@@ -41,12 +43,20 @@ public class RentService {
     private final RentRepository rentRepository;
     private final PageUtils pageUtils;
     private final MessagePublisher messagePublisher;
+    private final RestTemplate restTemplate;
 
     private static final int RENT_PAGE_SIZE = 10;
     private static final int RENT_SCALE_SIZE = 10;
+    private final static String GET_AUTH_USER_URL = "http://user-service/users?identifier=";
 
     @Transactional
     public RentResponseDto rentBook(Long id, String identifier) {
+        UserEmailDto userEmailDto = getUserEmailByIdentifier(identifier).getBody();
+
+        if (isNull(userEmailDto)) {
+            throw new EntityNotFoundException(ENTITY_NOT_FOUND);
+        }
+
         Book book = bookRepository.findByIdAndIsDeleted(id, false).orElseThrow(() -> new EntityNotFoundException(ENTITY_NOT_FOUND));
 
         if (book.isRent()) {
@@ -54,9 +64,9 @@ public class RentService {
         }
 
         /**
-         * send event to kafka
+         * send rent book event to kafka
          */
-        messagePublisher.publishBookRentMessage(book.toBookRentMessage(identifier));
+        messagePublisher.publishBookRentMessage(book.toBookRentMessage(identifier, userEmailDto.getEmail()));
 
         return RentMapper.INSTANCE.bookToRentResponseDto(book);
     }
@@ -88,6 +98,12 @@ public class RentService {
 
     @Transactional
     public BookResponseDto returnBook(Long bookId, Long rentId, String identifier) {
+        UserEmailDto userEmailDto = getUserEmailByIdentifier(identifier).getBody();
+
+        if (isNull(userEmailDto)) {
+            throw new EntityNotFoundException(ENTITY_NOT_FOUND);
+        }
+
         Book book = bookRepository.findByIdAndIsDeleted(bookId, false).orElseThrow(() -> new EntityNotFoundException(ENTITY_NOT_FOUND));
 
         if (isInValidIdentifier(book.getIdentifier(), identifier)) {
@@ -97,14 +113,9 @@ public class RentService {
         Rent rent = rentRepository.findById(rentId).orElseThrow(() -> new EntityNotFoundException(ENTITY_NOT_FOUND));
 
         /**
-         * send event to kafka
+         * send return book event to kafka
          */
-        messagePublisher.publishBookReturnMessage(BookReturnMessage.builder()
-                .bookId(bookId)
-                .rentId(rentId)
-                .identifier(identifier)
-                .bookAlertType(BookAlertType.RETURN)
-                .build());
+        messagePublisher.publishBookReturnMessage(book.toBookReturnMessage(identifier, userEmailDto.getEmail()));
 
         return BookMapper.INSTANCE.bookToBookAndRentResponseDto(book, rent);
     }
@@ -122,6 +133,10 @@ public class RentService {
         return Optional.ofNullable(identifierFromEntity)
                 .map(val -> !val.equals(identifier))
                 .orElse(true);
+    }
+
+    public ResponseEntity<UserEmailDto> getUserEmailByIdentifier(String identifier) {
+        return restTemplate.getForEntity(GET_AUTH_USER_URL + identifier, UserEmailDto.class);
     }
 
 }

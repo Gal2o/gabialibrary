@@ -5,7 +5,7 @@ import gabia.library.domain.book.BookRepository;
 import gabia.library.domain.rent.Rent;
 import gabia.library.domain.rent.RentRepository;
 import gabia.library.exception.EntityNotFoundException;
-import gabia.library.kafka.message.BookRentMessage;
+import gabia.library.kafka.BookRentMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
