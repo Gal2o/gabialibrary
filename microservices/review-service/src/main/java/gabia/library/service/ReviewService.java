@@ -1,7 +1,6 @@
 package gabia.library.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import gabia.library.domain.Review;
 import gabia.library.domain.ReviewRepository;
@@ -11,6 +10,7 @@ import gabia.library.dto.ReviewResponseDto;
 import gabia.library.exception.EntityNotFoundException;
 import gabia.library.exception.InvalidPageValueException;
 import gabia.library.exception.InvalidReviewIdentifierException;
+import gabia.library.exception.RestTemplateResponseBodyException;
 import gabia.library.mapper.ReviewMapper;
 import gabia.library.utils.jwt.JwtUtils;
 import gabia.library.utils.page.PageUtils;
@@ -29,9 +29,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static gabia.library.config.CommonUrlPathPrefix.BOOK_SERVICE_PREFIX;
-import static gabia.library.exception.message.CommonExceptionMessage.ENTITY_NOT_FOUND;
-import static gabia.library.exception.message.CommonExceptionMessage.INVALID_PAGE_VALUE;
+import static gabia.library.exception.message.CommonExceptionMessage.*;
 import static gabia.library.exception.message.ReviewExceptionMessage.INVALID_REVIEW_IDENTIFIER;
+import static java.util.Objects.isNull;
 
 
 @RequiredArgsConstructor
@@ -51,14 +51,18 @@ public class ReviewService {
     private static final int REVIEW_OF_BOOK_SCALE_SIZE = 10;
 
     @Transactional
-    public ReviewResponseDto.Add addReview(Long bookId, ReviewRequestDto.Post reviewRequestDto, String jwt) throws JsonProcessingException {
+    public ReviewResponseDto.Add addReview(Long bookId, ReviewRequestDto.Post reviewRequestDto, String jwt) {
         HttpEntity<BookRequestDto> entity = new HttpEntity<>(BookRequestDto.builder().rating(reviewRequestDto.getRating()).build(),
                 jwtUtils.getHttpHeadersIncludedJwt(jwt));
 
-        ResponseEntity<String> response
-                = restTemplate.exchange(REVIEW_IN_BOOK_URL + bookId + "/reviews", HttpMethod.POST, entity, String.class);
+        ResponseEntity<ReviewResponseDto.Add> reviewResponse
+                = restTemplate.exchange(REVIEW_IN_BOOK_URL + bookId + "/reviews", HttpMethod.POST, entity, ReviewResponseDto.Add.class);
 
-        ReviewResponseDto.Add reviewResponseDto = new ObjectMapper().readValue(response.getBody(), ReviewResponseDto.Add.class);
+        ReviewResponseDto.Add reviewResponseDto = reviewResponse.getBody();
+
+        if (isNull(reviewResponseDto)) {
+            throw new RestTemplateResponseBodyException(INVALID_REST_TEMPLATE_RESPONSE_BODY);
+        }
 
         reviewRepository.save(reviewRequestDto.toEntity(bookId, reviewResponseDto.getIdentifier()));
 
@@ -120,13 +124,13 @@ public class ReviewService {
 
         review.delete();
 
-        ResponseEntity<String> response
+        ResponseEntity<ReviewResponseDto.Delete> response
                 = restTemplate.exchange(REVIEW_IN_BOOK_URL + bookId + "/reviews",
                 HttpMethod.PUT,
                 new HttpEntity<>(BookRequestDto.builder().rating(review.getRating()).build(),
-                jwtUtils.getHttpHeadersIncludedJwt(jwt)), String.class);
+                jwtUtils.getHttpHeadersIncludedJwt(jwt)), ReviewResponseDto.Delete.class);
 
-        return new ObjectMapper().readValue(response.getBody(), ReviewResponseDto.Delete.class);
+        return response.getBody();
     }
 
     private List<ReviewResponseDto.Normal> getReviewResponseDtoList(Page<Review> reviewPage) {
