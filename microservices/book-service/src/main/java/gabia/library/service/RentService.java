@@ -8,16 +8,14 @@ import gabia.library.dto.BookResponseDto;
 import gabia.library.dto.RentResponseDto;
 import gabia.library.dto.UserEmailDto;
 import gabia.library.exception.*;
-import gabia.library.kafka.channel.BookRentOutputChannel;
-import gabia.library.kafka.channel.BookReturnOutputChannel;
-import gabia.library.kafka.publisher.MessagePublisher;
+import gabia.library.kafka.sender.KafkaBookRentMessageSender;
+import gabia.library.kafka.sender.KafkaBookReturnMessageSender;
 import gabia.library.mapper.BookMapper;
 import gabia.library.mapper.RentMapper;
 import gabia.library.utils.page.PageUtils;
 import gabia.library.utils.page.PagingResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +31,6 @@ import static gabia.library.exception.message.BookExceptionMessage.*;
 import static gabia.library.exception.message.CommonExceptionMessage.ENTITY_NOT_FOUND;
 import static java.util.Objects.isNull;
 
-@EnableBinding({BookRentOutputChannel.class, BookReturnOutputChannel.class})
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -42,7 +39,8 @@ public class RentService {
     private final BookRepository bookRepository;
     private final RentRepository rentRepository;
     private final PageUtils pageUtils;
-    private final MessagePublisher messagePublisher;
+    private final KafkaBookRentMessageSender kafkaBookRentMessageSender;
+    private final KafkaBookReturnMessageSender kafkaBookReturnMessageSender;
     private final RestTemplate restTemplate;
 
     private static final int RENT_PAGE_SIZE = 10;
@@ -66,7 +64,7 @@ public class RentService {
         /**
          * send rent book event to kafka
          */
-        messagePublisher.publishBookRentMessage(book.toBookRentMessage(identifier, userEmailDto.getEmail()));
+        kafkaBookRentMessageSender.send(book.toBookRentMessage(identifier, userEmailDto.getEmail()));
 
         return RentMapper.INSTANCE.bookToRentResponseDto(book);
     }
@@ -115,7 +113,7 @@ public class RentService {
         /**
          * send return book event to kafka
          */
-        messagePublisher.publishBookReturnMessage(book.toBookReturnMessage(identifier, userEmailDto.getEmail()));
+        kafkaBookReturnMessageSender.send(book.toBookReturnMessage(identifier, rentId, userEmailDto.getEmail()));
 
         return BookMapper.INSTANCE.bookToBookAndRentResponseDto(book, rent);
     }
