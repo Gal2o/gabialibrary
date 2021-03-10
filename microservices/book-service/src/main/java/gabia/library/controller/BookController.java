@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.nio.file.AccessDeniedException;
 
+@CrossOrigin(origins = {"*"})
 @RequiredArgsConstructor
 @RestController
 public class BookController {
