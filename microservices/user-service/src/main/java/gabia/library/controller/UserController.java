@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
-@CrossOrigin(origins = {"*"})
 @RequiredArgsConstructor
 @RestController
 public class UserController {
@@ -46,5 +45,10 @@ public class UserController {
     @JsonView(UserJsonView.Modify.class)
     public ResponseEntity<UserDto> removeUser(@PathVariable("id") Long id){
         return ResponseEntity.ok(userService.removeUser(id));
+    }
+
+    @GetMapping("/login")
+    public ResponseEntity<UserDto> getUser(@RequestParam("identifier") String identifier) {
+        return ResponseEntity.ok(userService.Login(identifier));
     }
 }

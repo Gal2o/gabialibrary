@@ -1,5 +1,6 @@
 package gabia.library.service;
 
+import gabia.library.config.CustomUserDetails;
 import gabia.library.config.UserCredentials;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +35,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("Username: " + username + " not found");
         }
 
-        return new User(userCredentials.getIdentifier(), userCredentials.getPassword(), getAuthorityList(userCredentials));
+        return new CustomUserDetails(userCredentials.getId(), userCredentials.getIdentifier(), userCredentials.getPassword(), getAuthorityList(userCredentials));
     }
 
     public ResponseEntity<UserCredentials> getAuthUserEntityByUsername(String username) {

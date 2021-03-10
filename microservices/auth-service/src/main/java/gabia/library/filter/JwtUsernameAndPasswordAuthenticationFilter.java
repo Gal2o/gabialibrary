@@ -1,6 +1,7 @@
 package gabia.library.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import gabia.library.config.CustomUserDetails;
 import gabia.library.config.JwtConfig;
 import gabia.library.config.UserCredentials;
 import io.jsonwebtoken.Jwts;
@@ -65,8 +66,15 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
 
         log.info("Success Authentication!");
 
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+
         // return jwt in response header
         response.addHeader(jwtConfig.getHeader(), jwtConfig.getPrefix() + " " + makeJwtWithAuthentication(authentication));
+
+        response.addHeader("authority", authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority).collect(Collectors.toList()).toString());
+
+        response.addHeader("id", customUserDetails.getId().toString());
     }
 
     @Override
