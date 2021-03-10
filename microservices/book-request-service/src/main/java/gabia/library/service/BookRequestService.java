@@ -22,8 +22,8 @@ public class BookRequestService {
     private final NaverConfig naverConfig;
     private RestTemplate restTemplate = new RestTemplate();
 
-    public List<Object> getBookRequest() {
-        String url = "https://openapi.naver.com/v1/search/book?query=";
+    public ResponseEntity<BookRequestDto> getBookRequest() {
+        String url = "https://openapi.naver.com/v1/search/book?query=%22%EC%9E%90%EB%B0%94%22&start=1&display=10";
 
         Map<String, String> requestHeaders = new HashMap<>();
         requestHeaders.put("X-Naver-Client-Id", naverConfig.getClientId());
@@ -32,6 +32,7 @@ public class BookRequestService {
 
         ResponseEntity<String> responseBody = restTemplate.exchange(url, HttpMethod.GET, headers, String.class);
         System.out.println(responseBody);
+        System.out.println("ASDFSAFDSFDSSASDSsd");
         JacksonJsonParser jacksonJsonParser = new JacksonJsonParser();
 
         return null;

@@ -22,7 +22,7 @@ public class BookRequestController {
 
     @GetMapping("/request-list")
     public ResponseEntity<BookRequestDto> getBookRequest(){
-        return null;
+        return bookRequestService.getBookRequest();
     }
 
     @GetMapping("/request-list/{title}")
