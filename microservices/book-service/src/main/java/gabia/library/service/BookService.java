@@ -29,7 +29,7 @@ public class BookService {
     private final BookRepository bookRepository;
     private final PageUtils pageUtils;
 
-    private static final int BOOK_PAGE_SIZE = 10;
+    private static final int BOOK_PAGE_SIZE = 12;
     private static final int BOOK_SCALE_SIZE = 10;
     private static final String FIRST_AVG_REVIEW_RATING = "0.0";
 
