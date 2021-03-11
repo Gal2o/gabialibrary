@@ -1,0 +1,50 @@
+server:
+  port: 8005
+
+spring:
+  application:
+    name: review-service
+  datasource:
+    url: jdbc:h2:~/review-service
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    database: H2
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+
+  h2:
+    console:
+      enabled: true
+      path: /console
+
+logging:
+  level:
+    org.hibernate.type: debug
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:8000/eureka  # default address
+
+ribbon:
+  eureka:
+    enabled: true
+
+book-service:
+  ribbon:
+    MaxAutoRetries: 0
+    MaxAutoRetriesNextServer: 1
+
+security:
+  jwt:
+    uri: /auth/**
+    header: Token
+    prefix: Bearer
+    expiration: 86400 # 24*60*60
+    secret: JwtSecretKey

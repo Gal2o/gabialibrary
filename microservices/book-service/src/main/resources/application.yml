@@ -1,5 +1,5 @@
 server:
-  port: 8082
+  port: 8004
 
 spring:
   application:
@@ -21,9 +21,34 @@ spring:
       enabled: true
       path: /console
 
+kafka:
+  bootstrapServers: 3.35.229.19:9092
+  topic:
+    rent:
+      name: book-rent-topic
+    return:
+      name: book-return-topic
+  consumer:
+    rent:
+      groupName: book-rent-consumer-group
+    return:
+      groupName: book-return-consumer-group
+
 logging:
   level:
     org.hibernate.type: debug
+
+eureka:
+  instance:
+    non-secure-port: ${server.port}
+    prefer-ip-address: true
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8000/eureka/
+
+ribbon:
+  eureka:
+    enabled: true
 
 security:
   jwt:

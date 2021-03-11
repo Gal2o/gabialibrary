@@ -1,11 +1,10 @@
 package gabia.library.controller;
 
-import gabia.library.config.JwtConfig;
-import gabia.library.dto.BookPagingResponseDto;
-import gabia.library.dto.BookRequestDto;
-import gabia.library.dto.BookResponseDto;
+import gabia.library.dto.*;
 import gabia.library.service.BookService;
-import io.jsonwebtoken.Jwts;
+import gabia.library.service.RentService;
+import gabia.library.utils.jwt.JwtUtils;
+import gabia.library.utils.page.PagingResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,14 +12,15 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.nio.file.AccessDeniedException;
-import java.util.Optional;
 
+@CrossOrigin(origins = {"*"})
 @RequiredArgsConstructor
 @RestController
 public class BookController {
 
     private final BookService bookService;
-    private final JwtConfig jwtConfig;
+    private final RentService rentService;
+    private final JwtUtils jwtUtils;
 
     @PostMapping("/books")
     public ResponseEntity<BookResponseDto> addBook(@RequestBody @Valid BookRequestDto.Post bookRequestDto) {
@@ -29,7 +29,7 @@ public class BookController {
     }
 
     @GetMapping("/books")
-    public ResponseEntity<BookPagingResponseDto> getBooks(@RequestParam(value = "page", required = false) Integer page) {
+    public ResponseEntity<PagingResponseDto> getBooks(@RequestParam(value = "page", required = false) Integer page) {
 
         return ResponseEntity.ok(bookService.getBooks(page));
     }
@@ -53,55 +53,47 @@ public class BookController {
     }
 
     @PutMapping("/books/{id}/rent")
-    public ResponseEntity<BookResponseDto> rentBook(@PathVariable("id") Long id, HttpServletRequest request) throws AccessDeniedException {
-        String jwt = getJwtFromRequest(request);
+    public ResponseEntity<RentResponseDto> rentBook(@PathVariable("id") Long id, HttpServletRequest request) throws AccessDeniedException {
+        String jwt = jwtUtils.getJwtFromRequest(request);
 
-        return ResponseEntity.ok(bookService.rentBook(id, getIdentifierFromJwt(jwt)));
+        return ResponseEntity.ok(rentService.rentBook(id, jwtUtils.getIdentifierFromJwt(jwt)));
     }
 
-    @PutMapping("/books/{id}/extension")
-    public ResponseEntity<BookResponseDto> extendRent(@PathVariable("id") Long id, HttpServletRequest request) throws AccessDeniedException {
-        String jwt = getJwtFromRequest(request);
+    @PutMapping("/books/{bookId}/rent/{rentId}/extension")
+    public ResponseEntity<BookResponseDto> extendRent(@PathVariable("bookId") Long bookId, @PathVariable("rentId") Long rentId, HttpServletRequest request) throws AccessDeniedException {
+        String jwt = jwtUtils.getJwtFromRequest(request);
 
-        return ResponseEntity.ok(bookService.extendRent(id, getIdentifierFromJwt(jwt)));
+        return ResponseEntity.ok(rentService.extendRent(bookId, rentId, jwtUtils.getIdentifierFromJwt(jwt)));
     }
 
-    @PutMapping("/books/{id}/return")
-    public ResponseEntity<BookResponseDto> returnBook(@PathVariable("id") Long id, HttpServletRequest request) throws AccessDeniedException {
-        String jwt = getJwtFromRequest(request);
+    @PutMapping("/books/{bookId}/rent/{rentId}/return")
+    public ResponseEntity<BookResponseDto> returnBook(@PathVariable("bookId") Long bookId, @PathVariable("rentId") Long rentId, HttpServletRequest request) throws AccessDeniedException {
+        String jwt = jwtUtils.getJwtFromRequest(request);
 
-        return ResponseEntity.ok(bookService.returnBook(id, getIdentifierFromJwt(jwt)));
+        return ResponseEntity.ok(rentService.returnBook(bookId, rentId, jwtUtils.getIdentifierFromJwt(jwt)));
     }
 
-    // TODO: 아래 jwt 관련 메서드 전부 추후에 공통으로 뺼 것
-    public boolean isInValidHeader(String header) {
-        return Optional.ofNullable(header)
-                .map(val -> !val.startsWith(jwtConfig.getPrefix()))
-                .orElse(true);
+    @GetMapping("/rent")
+    public ResponseEntity<PagingResponseDto> getRentListOfUser(@RequestParam(value = "page", required = false) Integer page, HttpServletRequest request) throws AccessDeniedException {
+        String jwt = jwtUtils.getJwtFromRequest(request);
+
+        return ResponseEntity.ok(rentService.getRentListOfUser(jwtUtils.getIdentifierFromJwt(jwt), page));
     }
 
-    private String getPureJwtInHeader(String header) {
-        return header.replace(jwtConfig.getPrefix(), "");
+    @PostMapping("/books/{id}/reviews")
+    public ResponseEntity<ReviewResponseDto> addReviewRating(@PathVariable("id") Long bookId, @RequestBody ReviewRequestDto reviewRequestDto,
+                                                             HttpServletRequest request) throws AccessDeniedException {
+        String jwt = jwtUtils.getJwtFromRequest(request);
+
+        return ResponseEntity.ok(bookService.addReviewRating(bookId, reviewRequestDto, jwtUtils.getIdentifierFromJwt(jwt)));
     }
 
-    private String getJwtFromRequest(HttpServletRequest request) throws AccessDeniedException {
-        String token = request.getHeader(jwtConfig.getHeader());
+    @PutMapping("/books/{id}/reviews")
+    public ResponseEntity<ReviewResponseDto> deleteReview(@PathVariable("id") Long id, @RequestBody ReviewRequestDto reviewRequestDto,
+                                                          HttpServletRequest request) throws AccessDeniedException {
+        String jwt = jwtUtils.getJwtFromRequest(request);
 
-        if(isInValidHeader(token)) {
-            throw new AccessDeniedException("유효하지 않은 토큰입니다.");
-        }
-
-        return getPureJwtInHeader(token);
+        return ResponseEntity.ok(bookService.deleteReview(id, reviewRequestDto, jwtUtils.getIdentifierFromJwt(jwt)));
     }
 
-    private String getIdentifierFromJwt(String jwt) {
-        return getSubjectFromJwt(jwt);
-    }
-
-    private String getSubjectFromJwt(String jwt) {
-        return Jwts.parser()                                                                // check expired time
-                .setSigningKey(jwtConfig.getSecret().getBytes())
-                .parseClaimsJws(jwt)
-                .getBody().getSubject();
-    }
 }

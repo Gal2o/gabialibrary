@@ -1,6 +1,6 @@
 package gabia.library.dto;
 
-import gabia.library.domain.Book;
+import gabia.library.domain.book.Book;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -65,6 +65,8 @@ public class BookRequestDto {
                     .isRent(false)
                     .isDeleted(false)
                     .extensionCount(0)
+                    .totalRating(0)
+                    .reviewCount(0)
                     .build();
         }
     }

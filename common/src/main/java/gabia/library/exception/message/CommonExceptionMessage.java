@@ -21,6 +21,7 @@ public class CommonExceptionMessage {
      * common business exception message
      */
     public static final String INVALID_PAGE_VALUE = "유효하지 않은 페이지 값 입니다.";
+    public static final String INVALID_REST_TEMPLATE_RESPONSE_BODY = "적절하지 않은 response body 입니다.";
 
 }
 
