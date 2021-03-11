@@ -1,12 +1,14 @@
 package gabia.library.controller;
 
 import gabia.library.dto.BookRequestDto;
+import gabia.library.dto.NaverBook;
 import gabia.library.service.BookRequestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @CrossOrigin(origins = {"*"})
 @RequiredArgsConstructor
@@ -20,14 +22,9 @@ public class BookRequestController {
         return null;
     }
 
-    @GetMapping("/request-list")
-    public ResponseEntity<BookRequestDto> getBookRequest(){
-        return bookRequestService.getBookRequest();
-    }
-
     @GetMapping("/request-list/{title}")
-    public ResponseEntity<BookRequestDto> getBookByNaverApi(@PathVariable("title") String title) {
-        return null;
+    public ResponseEntity<NaverBook> getBookByNaverApi(@PathVariable("title") String title) {
+        return ResponseEntity.ok(bookRequestService.getBookByNaverApi(title));
     }
 
     @PutMapping("/request-list/{id}/confirm")

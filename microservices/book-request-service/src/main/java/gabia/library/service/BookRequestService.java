@@ -2,17 +2,19 @@ package gabia.library.service;
 
 import gabia.library.config.NaverConfig;
 import gabia.library.dto.BookRequestDto;
+import gabia.library.dto.NaverBook;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.json.JacksonJsonParser;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Arrays;
+import java.util.Comparator;
 
 @RequiredArgsConstructor
 @Service
@@ -20,21 +22,19 @@ public class BookRequestService {
 
     private HttpEntity<?> headers;
     private final NaverConfig naverConfig;
-    private RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
+    private final ModelMapper modelMapper;
 
-    public ResponseEntity<BookRequestDto> getBookRequest() {
-        String url = "https://openapi.naver.com/v1/search/book?query=%22%EC%9E%90%EB%B0%94%22&start=1&display=10";
+    public NaverBook getBookByNaverApi(String title) {
 
-        Map<String, String> requestHeaders = new HashMap<>();
-        requestHeaders.put("X-Naver-Client-Id", naverConfig.getClientId());
-        requestHeaders.put("X-Naver-Client-Secret", naverConfig.getSecretId());
+        String url = naverConfig.geturl(title);
+
+        MultiValueMap<String, String> requestHeaders = new LinkedMultiValueMap<>();
+        requestHeaders.add("X-Naver-Client-Id", naverConfig.getClientId());
+        requestHeaders.add("X-Naver-Client-Secret", naverConfig.getSecretId());
+
         this.headers = new HttpEntity<>(requestHeaders);
 
-        ResponseEntity<String> responseBody = restTemplate.exchange(url, HttpMethod.GET, headers, String.class);
-        System.out.println(responseBody);
-        System.out.println("ASDFSAFDSFDSSASDSsd");
-        JacksonJsonParser jacksonJsonParser = new JacksonJsonParser();
-
-        return null;
+        return restTemplate.exchange(url, HttpMethod.GET, headers, NaverBook.class).getBody();
     }
 }
