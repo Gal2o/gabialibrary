@@ -91,7 +91,10 @@ public class RentService {
 
         rent.extendRent(book);
 
-        return BookMapper.INSTANCE.bookToBookAndRentResponseDto(book, rent);
+        BookResponseDto bookResponseDto = BookMapper.INSTANCE.bookToBookAndRentResponseDto(book, rent);
+        bookResponseDto.setAvgReviewRating(book.calcAvgReviewRating());
+
+        return bookResponseDto;
     }
 
     @Transactional
@@ -115,7 +118,10 @@ public class RentService {
          */
         kafkaBookReturnMessageSender.send(book.toBookReturnMessage(identifier, rentId, userEmailDto.getEmail()));
 
-        return BookMapper.INSTANCE.bookToBookAndRentResponseDto(book, rent);
+        BookResponseDto bookResponseDto = BookMapper.INSTANCE.bookToBookAndRentResponseDto(book, rent);
+        bookResponseDto.setAvgReviewRating(book.calcAvgReviewRating());
+
+        return bookResponseDto;
     }
 
     public PagingResponseDto getRentListOfUser(String identifier, Integer page) {
