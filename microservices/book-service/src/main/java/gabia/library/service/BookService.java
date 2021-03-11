@@ -37,7 +37,7 @@ public class BookService {
     public BookResponseDto addBook(BookRequestDto.Post bookRequestDto) {
         Book book = bookRepository.save(bookRequestDto.toEntity());
         BookResponseDto bookResponseDto = BookMapper.INSTANCE.bookToBookResponseDto(book);
-        bookResponseDto.setAvgReviewRating(FIRST_AVG_REVIEW_RATING);
+        bookResponseDto.setAvgReviewRating(Double.parseDouble(FIRST_AVG_REVIEW_RATING));
 
         return bookResponseDto;
     }
@@ -57,7 +57,7 @@ public class BookService {
         Book book = bookRepository.findByIdAndIsDeleted(id, false).orElseThrow(() -> new EntityNotFoundException(ENTITY_NOT_FOUND));
 
         BookResponseDto bookResponseDto = BookMapper.INSTANCE.bookToBookResponseDto(book);
-        bookResponseDto.setAvgReviewRating(book.calcAvgReviewRating());
+        bookResponseDto.setAvgReviewRating(Double.parseDouble(book.calcAvgReviewRating()));
 
         return bookResponseDto;
     }
@@ -69,7 +69,7 @@ public class BookService {
         book.update(bookRequestDto);
 
         BookResponseDto bookResponseDto = BookMapper.INSTANCE.bookToBookResponseDto(book);
-        bookResponseDto.setAvgReviewRating(book.calcAvgReviewRating());
+        bookResponseDto.setAvgReviewRating(Double.parseDouble(book.calcAvgReviewRating()));
 
         return bookResponseDto;
     }
@@ -81,7 +81,7 @@ public class BookService {
         book.delete();
 
         BookResponseDto bookResponseDto = BookMapper.INSTANCE.bookToBookResponseDto(book);
-        bookResponseDto.setAvgReviewRating(book.calcAvgReviewRating());
+        bookResponseDto.setAvgReviewRating(Double.parseDouble(book.calcAvgReviewRating()));
 
         return bookResponseDto;
     }
@@ -107,7 +107,7 @@ public class BookService {
     private List<BookResponseDto> getBookResponseDtoList(Page<Book> bookPage) {
         return bookPage.stream().map(book -> {
             BookResponseDto bookResponseDto = BookMapper.INSTANCE.bookToBookResponseDto(book);
-            bookResponseDto.setAvgReviewRating(book.calcAvgReviewRating());
+            bookResponseDto.setAvgReviewRating(Double.parseDouble(book.calcAvgReviewRating()));
 
             return bookResponseDto;
         }).collect(Collectors.toList());

@@ -146,7 +146,7 @@ public class Book {
     public ReviewResponseDto toReviewResponseDto(String reviewIdentifier) {
         return ReviewResponseDto.builder()
                 .identifier(reviewIdentifier)
-                .avgReviewRating(calcAvgReviewRating())
+                .avgReviewRating(Double.parseDouble(calcAvgReviewRating()))
                 .reviewCount(reviewCount)
                 .build();
     }
