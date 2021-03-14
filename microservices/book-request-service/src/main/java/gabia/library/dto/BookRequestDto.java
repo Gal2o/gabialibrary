@@ -1,5 +1,6 @@
 package gabia.library.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonView;
 import gabia.library.config.BookRequestJsonView;
 import lombok.Getter;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 public class BookRequestDto {
+
 
     private Long id;
 
@@ -43,8 +45,10 @@ public class BookRequestDto {
     private boolean isDeleted;
 
     @Column(name = "created_date")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime createdDate;
 
     @Column(name = "updated_date")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime updatedDate;
 }

@@ -19,21 +19,26 @@ public class BookRequestController {
 
     @PostMapping("/request-list")
     public ResponseEntity<BookRequestDto> addBookRequest(@RequestBody @Valid BookRequestDto bookRequestDto){
-        return null;
+        return ResponseEntity.ok(bookRequestService.addBookRequest(bookRequestDto));
     }
 
     @GetMapping("/request-list/{title}")
-    public ResponseEntity<NaverBook> getBookByNaverApi(@PathVariable("title") String title) {
-        return ResponseEntity.ok(bookRequestService.getBookByNaverApi(title));
+    public ResponseEntity<NaverBook> getBookByNaverApi(@PathVariable("title") String title, @RequestParam("page") Long page) {
+        return ResponseEntity.ok(bookRequestService.getBookByNaverApi(title, page));
+    }
+
+    @GetMapping("/request-list")
+    public ResponseEntity<List<BookRequestDto>> findAll(){
+        return ResponseEntity.ok(bookRequestService.findAll());
     }
 
     @PutMapping("/request-list/{id}/confirm")
     public ResponseEntity<BookRequestDto> confirmBookRequest(@PathVariable("id") Long id){
-        return null;
+        return ResponseEntity.ok(bookRequestService.confirmBookRequest(id));
     }
 
-    @PutMapping("/request-list/{id}/cancel")
+    @DeleteMapping ("/request-list/{id}/cancel")
     public ResponseEntity<BookRequestDto> cancelBookRequest(@PathVariable("id") Long id){
-        return null;
+        return ResponseEntity.ok(bookRequestService.cancelBookRequest(id));
     }
 }
