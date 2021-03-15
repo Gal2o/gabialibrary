@@ -6,10 +6,10 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum Status {
-    REQUESTED("REQUESTED"),
-    CANCELED("CANCELED"),
-    BUYING("BUYING"),
-    COMPLETED("COMPLETED");
+    REQUESTED("요청중"),
+    CANCELED("취소"),
+    BUYING("구매중"),
+    COMPLETED("구매완료");
 
     private final String status;
 }

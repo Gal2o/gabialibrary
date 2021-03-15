@@ -4,13 +4,13 @@ import gabia.library.config.NaverConfig;
 import gabia.library.domain.BookRequest;
 import gabia.library.domain.BookRequestRepository;
 import gabia.library.domain.Destination;
+import gabia.library.domain.Status;
 import gabia.library.dto.BookRequestDto;
 import gabia.library.dto.NaverBook;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
@@ -18,8 +18,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,12 +35,11 @@ public class BookRequestService {
     public BookRequestDto addBookRequest(BookRequestDto bookRequestDto) {
         BookRequest bookRequest = bookRequestRepository.save(BookRequest.builder()
                 .userId(bookRequestDto.getUserId())
-                .bookId(bookRequestDto.getBookId())
                 .bookName(bookRequestDto.getBookName())
                 .author(bookRequestDto.getAuthor())
                 .destination(bookRequestDto.getDestination())
                 .url(bookRequestDto.getUrl())
-                .status(bookRequestDto.getStatus())
+                .status(Status.REQUESTED)
                 .build());
 
         return modelMapper.map(bookRequest, BookRequestDto.class);

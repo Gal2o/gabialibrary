@@ -21,7 +21,7 @@ public class BookRequest extends BaseTimeEntity {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    @Column(name = "book_id", nullable = false)
+    @Column(name = "book_id")
     private Long bookId;
 
     @Column(name = "book_name", nullable = false)
@@ -31,28 +31,29 @@ public class BookRequest extends BaseTimeEntity {
     private String author;
 
     @Column(nullable = false)
-    private String destination;
+    @Enumerated(EnumType.STRING)
+    private Destination destination;
 
     @Column(nullable = false)
     private String url;
 
     @Column(nullable = false)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
     @Column(name = "is_deleted", columnDefinition = "boolean default false", nullable = false)
     private boolean isDeleted;
 
-    public void update() { this.status = "COMPLETED"; }
+    public void update() { this.status = Status.COMPLETED; }
 
     public void remove() {
-        this.status = "CANCELED";
+        this.status = Status.CANCELED;
         this.isDeleted = true;
     }
 
     @Builder
-    public BookRequest(Long userId, Long bookId, String bookName, String author, String destination, String url, String status) {
+    public BookRequest(Long userId, String bookName, String author, Destination destination, String url, Status status) {
         this.userId = userId;
-        this.bookId = bookId;
         this.bookName = bookName;
         this.author = author;
         this.destination = destination;

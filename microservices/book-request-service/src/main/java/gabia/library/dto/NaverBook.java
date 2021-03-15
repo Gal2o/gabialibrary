@@ -1,5 +1,6 @@
 package gabia.library.dto;
 
+import lombok.Builder;
 import lombok.Data;
 
 @Data
