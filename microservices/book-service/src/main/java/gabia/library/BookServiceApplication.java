@@ -1,8 +1,8 @@
 package gabia.library;
 
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
@@ -11,9 +11,14 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @SpringBootApplication(exclude = { KafkaAutoConfiguration.class })
 public class BookServiceApplication {
 
-    public static void main(String[] args) {
+    private static final String APPLICATION_LOCATIONS = "spring.config.location="
+            + "classpath:application.yml,"
+            + "/root/gabia-library-config/book-service.yml";
 
-        SpringApplication.run(BookServiceApplication.class, args);
+    public static void main(String[] args) {
+        new SpringApplicationBuilder(BookServiceApplication.class)
+                .properties(APPLICATION_LOCATIONS)
+                .run(args);
     }
 
 }
