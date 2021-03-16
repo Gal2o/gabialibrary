@@ -146,13 +146,16 @@ public class Book {
     public ReviewResponseDto toReviewResponseDto(String reviewIdentifier) {
         return ReviewResponseDto.builder()
                 .identifier(reviewIdentifier)
-                .avgReviewRating(calcAvgReviewRating())
+                .avgReviewRating(Double.parseDouble(calcAvgReviewRating()))
                 .reviewCount(reviewCount)
                 .build();
     }
 
-    public int calcAvgReviewRating() {
-        return (int) round((double) this.getTotalRating() / this.getReviewCount());
+    public String calcAvgReviewRating() {
+        if (this.getReviewCount() == 0) {
+            return "0.0";
+        }
+        return String.format("%.1f", (double) this.getTotalRating() / this.getReviewCount());
     }
 
     public Rent toRent(String identifier, LocalDate rentExpiredDate) {
