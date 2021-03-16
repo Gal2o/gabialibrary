@@ -35,4 +35,18 @@ public class SwaggerCommonConfig {
         swaggerResource.setSwaggerVersion(version);
         return swaggerResource;
     }
+
+    public static final String[] SWAGGER_AUTH_WHITELIST = {
+            "/swagger-resources/**",
+            "/swagger-ui.html",
+            "/v2/api-docs",
+            "/webjars/**",
+            "/swagger-ui/**",
+            "/user-service/v2/api-docs",
+            "/book-service/v2/api-docs",
+            "/review-service/v2/api-docs",
+            "/alert-service/v2/api-docs",
+            "/notice-service/v2/api-docs",
+            "/book-request-service/v2/api-docs"
+    };
 }

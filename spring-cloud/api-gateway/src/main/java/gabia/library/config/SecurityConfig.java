@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.util.Arrays;
 
+import static gabia.library.config.SwaggerCommonConfig.SWAGGER_AUTH_WHITELIST;
 import static org.springframework.http.HttpMethod.POST;
 
 @RequiredArgsConstructor
@@ -28,17 +29,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final JwtConfig jwtConfig;
     private final JwtUtils jwtUtils;
-
-    private static final String[] SWAGGER_AUTH_WHITELIST = {
-            "/swagger-resources/**",
-            "/swagger-ui.html",
-            "/v2/api-docs",
-            "/webjars/**",
-            "/swagger-ui/**",
-            "/user-service/v2/api-docs",
-            "/book-service/v2/api-docs",
-            "/review-service/v2/api-docs"
-    };
 
     @Override
     public void configure(WebSecurity web) throws Exception {
@@ -76,8 +66,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .addFilterBefore(new JwtAuthenticationFilter(jwtConfig, jwtUtils), UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/book-service/books").hasRole(AuthRole.USER.getAuthority())
-                .antMatchers(HttpMethod.GET,"/user-service/admin").hasRole(AuthRole.ADMIN.getAuthority())
+                .antMatchers(HttpMethod.POST, "/notice-service/notices").hasRole(AuthRole.ADMIN.getAuthority())
+                .antMatchers(HttpMethod.PUT, "/notice-service/notices/**").hasRole(AuthRole.ADMIN.getAuthority())
+                .antMatchers(HttpMethod.DELETE, "/notice-service/notices/**").hasRole(AuthRole.ADMIN.getAuthority())
                 .anyRequest().authenticated();
     }
 }

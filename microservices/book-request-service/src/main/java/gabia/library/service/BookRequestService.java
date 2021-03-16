@@ -3,21 +3,30 @@ package gabia.library.service;
 import gabia.library.config.NaverConfig;
 import gabia.library.domain.BookRequest;
 import gabia.library.domain.BookRequestRepository;
-import gabia.library.domain.Destination;
 import gabia.library.domain.Status;
 import gabia.library.dto.BookRequestDto;
 import gabia.library.dto.NaverBook;
 import lombok.RequiredArgsConstructor;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustStrategy;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import javax.net.ssl.SSLContext;
 import javax.persistence.EntityNotFoundException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,7 +37,6 @@ public class BookRequestService {
 
     private HttpEntity<?> headers;
     private final NaverConfig naverConfig;
-    private final RestTemplate restTemplate;
     private final ModelMapper modelMapper;
     private final BookRequestRepository bookRequestRepository;
 
@@ -45,7 +53,8 @@ public class BookRequestService {
         return modelMapper.map(bookRequest, BookRequestDto.class);
     }
 
-    public NaverBook getBookByNaverApi(String title, Long page) {
+    public NaverBook getBookByNaverApi(String title, Long page) throws NoSuchAlgorithmException,
+            KeyStoreException, KeyManagementException {
 
         String url = naverConfig.geturl(title, page);
 
@@ -55,7 +64,7 @@ public class BookRequestService {
 
         this.headers = new HttpEntity<>(requestHeaders);
 
-        return restTemplate.exchange(url, HttpMethod.GET, headers, NaverBook.class).getBody();
+        return getRestTemplate().exchange(url, HttpMethod.GET, headers, NaverBook.class).getBody();
     }
 
     public List<BookRequestDto> findAll(){
@@ -81,5 +90,27 @@ public class BookRequestService {
         bookRequest.remove();
 
         return modelMapper.map(bookRequest, BookRequestDto.class);
+    }
+
+    public RestTemplate getRestTemplate()
+            throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
+
+        TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
+
+        SSLContext sslContext = org.apache.http.ssl.SSLContexts.custom()
+                .loadTrustMaterial(null, acceptingTrustStrategy)
+                .build();
+
+        SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
+
+        CloseableHttpClient httpClient = HttpClients.custom()
+                .setSSLSocketFactory(csf)
+                .build();
+
+        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
+
+        requestFactory.setHttpClient(httpClient);
+
+        return new RestTemplate(requestFactory);
     }
 }

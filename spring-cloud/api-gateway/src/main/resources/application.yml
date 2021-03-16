@@ -20,6 +20,14 @@ zuul:
     review-service:
       path: /reviews/**
       serviceId: review-service
+    alert-service:
+      path: /alerts/**
+      serviceId: alert-service
+    notice-service:
+      path: /notices/**
+      serviceId: notice-service
+    book-request-service:
+      path: /request-list/**
 
 ribbon:
   ReadTimeout: 60000

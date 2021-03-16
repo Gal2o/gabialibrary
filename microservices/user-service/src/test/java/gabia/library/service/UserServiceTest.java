@@ -14,6 +14,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@ActiveProfiles({ "test", "dev" })
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @Transactional
@@ -55,7 +57,7 @@ public class UserServiceTest {
 
         //then
         ModelMapper mo = new ModelMapper();
-        Assertions.assertEquals(userService.findUser(1L), mo.map(u1, UserDto.class), "fail" );
+        Assertions.assertEquals(userService.findUser(1L).getUserName(), mo.map(u1, UserDto.class).getUserName(), "fail" );
     }
 
     @Test

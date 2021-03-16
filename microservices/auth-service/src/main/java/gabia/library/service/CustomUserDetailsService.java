@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,13 +14,14 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
+import static gabia.library.config.CommonUrlPathPrefix.USER_SERVICE_PREFIX;
 import static java.util.Objects.isNull;
 
 @RequiredArgsConstructor
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final static String GET_AUTH_USER_URL = "http://user-service/users?identifier=";
+    private final static String GET_AUTH_USER_URL = USER_SERVICE_PREFIX + "/login?identifier=";
 
     private final RestTemplate restTemplate;
 

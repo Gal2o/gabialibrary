@@ -1,11 +1,11 @@
 package gabia.library.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import gabia.library.common.exception.response.ErrorResponse;
 import gabia.library.config.JwtConfig;
 import gabia.library.config.MockMvcTest;
 import gabia.library.dto.BookRequestDto;
 import gabia.library.dto.BookResponseDto;
+import gabia.library.exception.ErrorResponse;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,8 +23,8 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Date;
 
-import static gabia.library.common.exception.message.CommonExceptionMessage.INVALID_INPUT_VALUE;
 import static gabia.library.exception.message.BookExceptionMessage.*;
+import static gabia.library.exception.message.CommonExceptionMessage.INVALID_INPUT_VALUE;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -122,134 +122,134 @@ public class BookApiTest {
         assertEquals(bookResponseDto.getTitle(), deleteBookResponseDto.getTitle());
     }
 
-    @DisplayName("책 대여 테스트")
-    @Test
-    public void rentBookTest() throws Exception {
-        BookRequestDto.Post bookRequestDto = getPostRequestDto();
-        // 책 추가 API 호출
-        BookResponseDto bookResponseDto = objectMapper.readValue(addBookAPI(bookRequestDto, status().is2xxSuccessful()).getContentAsString(), BookResponseDto.class);
-
-        String testJwt = makeTestJwt();
-        // 책 대여 API 호출
-        MockHttpServletResponse rentResponse = rentBookAPI(bookResponseDto.getId(), testJwt, status().is2xxSuccessful());
-
-        BookResponseDto rentBookResponseDto = objectMapper.readValue(rentResponse.getContentAsString(), BookResponseDto.class);
-
-        assertTrue(rentBookResponseDto.isRent());
-        assertEquals("test", rentBookResponseDto.getIdentifier());
-        assertEquals(LocalDate.now().plusMonths(1), rentBookResponseDto.getRentExpiredDate());
-    }
-
-
-    @DisplayName("책 대여 중복 테스트")
-    @Test
-    public void rentBookDuplicatedTest() throws Exception {
-        BookRequestDto.Post bookRequestDto = getPostRequestDto();
-
-        BookResponseDto bookResponseDto = objectMapper.readValue(addBookAPI(bookRequestDto, status().is2xxSuccessful()).getContentAsString(), BookResponseDto.class);
-
-        String testJwt = makeTestJwt();
-        // 책 대여 API 호출
-        rentBookAPI(bookResponseDto.getId(), testJwt, status().is2xxSuccessful());
-
-        // 이미 대여 완료된 책에 한번 더 대여 API 호출
-        MockHttpServletResponse dupResponse = rentBookAPI(bookResponseDto.getId(), testJwt, status().is4xxClientError());
-
-        ErrorResponse errorResponse = objectMapper.readValue(dupResponse.getContentAsString(), ErrorResponse.class);
-
-        assertEquals(errorResponse.getMessage(), ALREADY_RENT);
-    }
-
-    @DisplayName("책 대여연장 테스트")
-    @Test
-    public void extensionBookTest() throws Exception {
-        BookRequestDto.Post bookRequestDto = getPostRequestDto();
-        // 책 추가 API 호출
-        BookResponseDto bookResponseDto = objectMapper.readValue(addBookAPI(bookRequestDto, status().is2xxSuccessful()).getContentAsString(), BookResponseDto.class);
-
-        String testJwt = makeTestJwt();
-
-        // 책 대여 API 호출
-        rentBookAPI(bookResponseDto.getId(), testJwt, status().is2xxSuccessful());
-
-        // 책 대여연장 API 호출
-        MockHttpServletResponse extensionResponse = extensionBookAPI(bookResponseDto.getId(), testJwt, status().is2xxSuccessful());
-
-        BookResponseDto bookExtensionResponseDto = objectMapper.readValue(extensionResponse.getContentAsString(), BookResponseDto.class);
-
-        assertEquals( bookResponseDto.getExtensionCount() + 1, bookExtensionResponseDto.getExtensionCount());
-        assertEquals(LocalDate.now().plusMonths(2), bookExtensionResponseDto.getRentExpiredDate());
-    }
-
-    @DisplayName("올바르지 않은 id의 jwt를 통한 책 연장 테스트")
-    @Test
-    public void bookRentWithUnValidJwtTest() throws Exception {
-        BookRequestDto.Post bookRequestDto = getPostRequestDto();
-        // 책 추가 API 호출
-        BookResponseDto bookResponseDto = objectMapper.readValue(addBookAPI(bookRequestDto, status().is2xxSuccessful()).getContentAsString(), BookResponseDto.class);
-
-        String validJwt = makeTestJwt();
-
-        // 책 대여 API 호출
-        rentBookAPI(bookResponseDto.getId(), validJwt, status().is2xxSuccessful());
-
-        String unValidJwt = makeUnValidTestJwt();
-
-        // 책 대여연장 API 호출
-        MockHttpServletResponse extensionResponse = extensionBookAPI(bookResponseDto.getId(), unValidJwt, status().is4xxClientError());
-
-        ErrorResponse errorResponse = objectMapper.readValue(extensionResponse.getContentAsString(), ErrorResponse.class);
-
-        assertEquals(errorResponse.getMessage(), INVALID_IDENTIFIER_VALUE);
-    }
-
-    @DisplayName("책 대여 3회 초과 테스트")
-    @Test
-    public void extensionBookExceptionTest() throws Exception {
-        BookRequestDto.Post bookRequestDto = getPostRequestDto();
-        // 책 추가 API 호출
-        BookResponseDto bookResponseDto = objectMapper.readValue(addBookAPI(bookRequestDto, status().is2xxSuccessful()).getContentAsString(), BookResponseDto.class);
-
-        String testJwt = makeTestJwt();
-
-        // 책 대여 API 호출
-        rentBookAPI(bookResponseDto.getId(), testJwt, status().is2xxSuccessful());
-
-        // 책 대여연장 API 3회 호출
-        for(int i = 0; i < 3; i++) {
-            extensionBookAPI(bookResponseDto.getId(), testJwt, status().is2xxSuccessful());
-        }
-
-        // 책 대여연장 API 호출
-        MockHttpServletResponse extensionResponse = extensionBookAPI(bookResponseDto.getId(), testJwt, status().is4xxClientError());
-
-        ErrorResponse errorResponse = objectMapper.readValue(extensionResponse.getContentAsString(), ErrorResponse.class);
-
-        assertEquals(errorResponse.getMessage(), INVALID_EXTENSION_COUNT_VALUE);
-    }
-
-    @DisplayName("책 반납 테스트")
-    @Test
-    public void returnBookTest() throws Exception {
-        BookRequestDto.Post bookRequestDto = getPostRequestDto();
-        // 책 추가 API 호출
-        BookResponseDto bookResponseDto = objectMapper.readValue(addBookAPI(bookRequestDto, status().is2xxSuccessful()).getContentAsString(), BookResponseDto.class);
-
-        String testJwt = makeTestJwt();
-
-        // 책 대여 API 호출
-        rentBookAPI(bookResponseDto.getId(), testJwt, status().is2xxSuccessful());
-
-        // 책 반환 API 호출
-        MockHttpServletResponse returnResponse = returnBookAPI(bookResponseDto.getId(), testJwt, status().is2xxSuccessful());
-
-        BookResponseDto returnBookResponseDto = objectMapper.readValue(returnResponse.getContentAsString(), BookResponseDto.class);
-
-        assertNull(returnBookResponseDto.getIdentifier());
-        assertFalse(returnBookResponseDto.isRent());
-        assertEquals(returnBookResponseDto.getExtensionCount(), 0);
-        assertNull(returnBookResponseDto.getRentExpiredDate());
-    }
+//    @DisplayName("책 대여 테스트")
+//    @Test
+//    public void rentBookTest() throws Exception {
+//        BookRequestDto.Post bookRequestDto = getPostRequestDto();
+//        // 책 추가 API 호출
+//        BookResponseDto bookResponseDto = objectMapper.readValue(addBookAPI(bookRequestDto, status().is2xxSuccessful()).getContentAsString(), BookResponseDto.class);
+//
+//        String testJwt = makeTestJwt();
+//        // 책 대여 API 호출
+//        MockHttpServletResponse rentResponse = rentBookAPI(bookResponseDto.getId(), testJwt, status().is2xxSuccessful());
+//
+//        BookResponseDto rentBookResponseDto = objectMapper.readValue(rentResponse.getContentAsString(), BookResponseDto.class);
+//
+//        assertTrue(rentBookResponseDto.isRent());
+//        assertEquals("test", rentBookResponseDto.getIdentifier());
+//        assertEquals(LocalDate.now().plusMonths(1), rentBookResponseDto.getRentExpiredDate());
+//    }
+//
+//
+//    @DisplayName("책 대여 중복 테스트")
+//    @Test
+//    public void rentBookDuplicatedTest() throws Exception {
+//        BookRequestDto.Post bookRequestDto = getPostRequestDto();
+//
+//        BookResponseDto bookResponseDto = objectMapper.readValue(addBookAPI(bookRequestDto, status().is2xxSuccessful()).getContentAsString(), BookResponseDto.class);
+//
+//        String testJwt = makeTestJwt();
+//        // 책 대여 API 호출
+//        rentBookAPI(bookResponseDto.getId(), testJwt, status().is2xxSuccessful());
+//
+//        // 이미 대여 완료된 책에 한번 더 대여 API 호출
+//        MockHttpServletResponse dupResponse = rentBookAPI(bookResponseDto.getId(), testJwt, status().is4xxClientError());
+//
+//        ErrorResponse errorResponse = objectMapper.readValue(dupResponse.getContentAsString(), ErrorResponse.class);
+//
+//        assertEquals(errorResponse.getMessage(), ALREADY_RENT);
+//    }
+//
+//    @DisplayName("책 대여연장 테스트")
+//    @Test
+//    public void extensionBookTest() throws Exception {
+//        BookRequestDto.Post bookRequestDto = getPostRequestDto();
+//        // 책 추가 API 호출
+//        BookResponseDto bookResponseDto = objectMapper.readValue(addBookAPI(bookRequestDto, status().is2xxSuccessful()).getContentAsString(), BookResponseDto.class);
+//
+//        String testJwt = makeTestJwt();
+//
+//        // 책 대여 API 호출
+//        rentBookAPI(bookResponseDto.getId(), testJwt, status().is2xxSuccessful());
+//
+//        // 책 대여연장 API 호출
+//        MockHttpServletResponse extensionResponse = extensionBookAPI(bookResponseDto.getId(), testJwt, status().is2xxSuccessful());
+//
+//        BookResponseDto bookExtensionResponseDto = objectMapper.readValue(extensionResponse.getContentAsString(), BookResponseDto.class);
+//
+//        assertEquals( bookResponseDto.getExtensionCount() + 1, bookExtensionResponseDto.getExtensionCount());
+//        assertEquals(LocalDate.now().plusMonths(2), bookExtensionResponseDto.getRentExpiredDate());
+//    }
+//
+//    @DisplayName("올바르지 않은 id의 jwt를 통한 책 연장 테스트")
+//    @Test
+//    public void bookRentWithUnValidJwtTest() throws Exception {
+//        BookRequestDto.Post bookRequestDto = getPostRequestDto();
+//        // 책 추가 API 호출
+//        BookResponseDto bookResponseDto = objectMapper.readValue(addBookAPI(bookRequestDto, status().is2xxSuccessful()).getContentAsString(), BookResponseDto.class);
+//
+//        String validJwt = makeTestJwt();
+//
+//        // 책 대여 API 호출
+//        rentBookAPI(bookResponseDto.getId(), validJwt, status().is2xxSuccessful());
+//
+//        String unValidJwt = makeUnValidTestJwt();
+//
+//        // 책 대여연장 API 호출
+//        MockHttpServletResponse extensionResponse = extensionBookAPI(bookResponseDto.getId(), unValidJwt, status().is4xxClientError());
+//
+//        ErrorResponse errorResponse = objectMapper.readValue(extensionResponse.getContentAsString(), ErrorResponse.class);
+//
+//        assertEquals(errorResponse.getMessage(), INVALID_IDENTIFIER_VALUE);
+//    }
+//
+//    @DisplayName("책 대여 3회 초과 테스트")
+//    @Test
+//    public void extensionBookExceptionTest() throws Exception {
+//        BookRequestDto.Post bookRequestDto = getPostRequestDto();
+//        // 책 추가 API 호출
+//        BookResponseDto bookResponseDto = objectMapper.readValue(addBookAPI(bookRequestDto, status().is2xxSuccessful()).getContentAsString(), BookResponseDto.class);
+//
+//        String testJwt = makeTestJwt();
+//
+//        // 책 대여 API 호출
+//        rentBookAPI(bookResponseDto.getId(), testJwt, status().is2xxSuccessful());
+//
+//        // 책 대여연장 API 3회 호출
+//        for(int i = 0; i < 3; i++) {
+//            extensionBookAPI(bookResponseDto.getId(), testJwt, status().is2xxSuccessful());
+//        }
+//
+//        // 책 대여연장 API 호출
+//        MockHttpServletResponse extensionResponse = extensionBookAPI(bookResponseDto.getId(), testJwt, status().is4xxClientError());
+//
+//        ErrorResponse errorResponse = objectMapper.readValue(extensionResponse.getContentAsString(), ErrorResponse.class);
+//
+//        assertEquals(errorResponse.getMessage(), INVALID_EXTENSION_COUNT_VALUE);
+//    }
+//
+//    @DisplayName("책 반납 테스트")
+//    @Test
+//    public void returnBookTest() throws Exception {
+//        BookRequestDto.Post bookRequestDto = getPostRequestDto();
+//        // 책 추가 API 호출
+//        BookResponseDto bookResponseDto = objectMapper.readValue(addBookAPI(bookRequestDto, status().is2xxSuccessful()).getContentAsString(), BookResponseDto.class);
+//
+//        String testJwt = makeTestJwt();
+//
+//        // 책 대여 API 호출
+//        rentBookAPI(bookResponseDto.getId(), testJwt, status().is2xxSuccessful());
+//
+//        // 책 반환 API 호출
+//        MockHttpServletResponse returnResponse = returnBookAPI(bookResponseDto.getId(), testJwt, status().is2xxSuccessful());
+//
+//        BookResponseDto returnBookResponseDto = objectMapper.readValue(returnResponse.getContentAsString(), BookResponseDto.class);
+//
+//        assertNull(returnBookResponseDto.getIdentifier());
+//        assertFalse(returnBookResponseDto.isRent());
+//        assertEquals(returnBookResponseDto.getExtensionCount(), 0);
+//        assertNull(returnBookResponseDto.getRentExpiredDate());
+//    }
 
     private BookRequestDto.Post getPostRequestDto() {
         return BookRequestDto.Post.builder()

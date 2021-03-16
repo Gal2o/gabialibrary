@@ -45,7 +45,7 @@ public class RentService {
 
     private static final int RENT_PAGE_SIZE = 10;
     private static final int RENT_SCALE_SIZE = 10;
-    private final static String GET_AUTH_USER_URL = "http://user-service/users?identifier=";
+    private final static String GET_AUTH_USER_URL = "http://user-service/login?identifier=";
 
     @Transactional
     public RentResponseDto rentBook(Long id, String identifier) {

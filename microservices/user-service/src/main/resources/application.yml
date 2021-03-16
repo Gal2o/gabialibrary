@@ -24,3 +24,23 @@ spring:
 logging:
   level:
     org.hibernate.type: debug
+
+eureka:
+  instance:
+    non-secure-port: ${server.port}
+    prefer-ip-address: true
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8000/eureka/
+
+ribbon:
+  eureka:
+    enabled: true
+
+security:
+  jwt:
+    uri: /auth/**
+    header: Token
+    prefix: Bearer
+    expiration: 86400 # 24*60*60
+    secret: JwtSecretKey

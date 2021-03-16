@@ -8,6 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 @CrossOrigin(origins = {"*"})
@@ -23,7 +26,7 @@ public class BookRequestController {
     }
 
     @GetMapping("/request-list/{title}")
-    public ResponseEntity<NaverBook> getBookByNaverApi(@PathVariable("title") String title, @RequestParam("page") Long page) {
+    public ResponseEntity<NaverBook> getBookByNaverApi(@PathVariable("title") String title, @RequestParam("page") Long page) throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
         return ResponseEntity.ok(bookRequestService.getBookByNaverApi(title, page));
     }
 
