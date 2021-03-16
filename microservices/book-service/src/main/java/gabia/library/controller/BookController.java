@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.nio.file.AccessDeniedException;
+import java.util.List;
 
 @CrossOrigin(origins = {"*"})
 @RequiredArgsConstructor
@@ -94,6 +95,18 @@ public class BookController {
         String jwt = jwtUtils.getJwtFromRequest(request);
 
         return ResponseEntity.ok(bookService.deleteReview(id, reviewRequestDto, jwtUtils.getIdentifierFromJwt(jwt)));
+    }
+
+    @GetMapping("/books/latest")
+    public ResponseEntity<List<BookResponseDto>> getLatestBooks() {
+
+        return ResponseEntity.ok(bookService.getLatestBooks());
+    }
+
+    @GetMapping("/books/many-reviews")
+    public ResponseEntity<?> getManyReviewsBooks() {
+
+        return ResponseEntity.ok(bookService.getManyReviewsBooks());
     }
 
 }

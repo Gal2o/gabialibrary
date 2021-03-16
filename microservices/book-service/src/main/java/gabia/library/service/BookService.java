@@ -104,6 +104,18 @@ public class BookService {
         return book.toReviewResponseDto(identifier);
     }
 
+    public List<BookResponseDto> getLatestBooks() {
+        List<Book> books = bookRepository.findTop10ByOrderByCreatedDateDesc();
+
+        return books.stream().map(BookMapper.INSTANCE::bookToBookResponseDto).collect(Collectors.toList());
+    }
+
+    public List<BookResponseDto> getManyReviewsBooks() {
+        List<Book> books = bookRepository.findTop10ByOrderByReviewCountDesc();
+
+        return books.stream().map(BookMapper.INSTANCE::bookToBookResponseDto).collect(Collectors.toList());
+    }
+
     private List<BookResponseDto> getBookResponseDtoList(Page<Book> bookPage) {
         return bookPage.stream().map(book -> {
             BookResponseDto bookResponseDto = BookMapper.INSTANCE.bookToBookResponseDto(book);

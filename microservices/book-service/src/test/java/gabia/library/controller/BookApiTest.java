@@ -20,10 +20,9 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
-import static gabia.library.exception.message.BookExceptionMessage.*;
 import static gabia.library.exception.message.CommonExceptionMessage.INVALID_INPUT_VALUE;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -120,6 +119,34 @@ public class BookApiTest {
         BookResponseDto deleteBookResponseDto = objectMapper.readValue(deleteResponse.getContentAsString(), BookResponseDto.class);
 
         assertEquals(bookResponseDto.getTitle(), deleteBookResponseDto.getTitle());
+    }
+
+    @DisplayName("최신 도서 10개 조회 테스트")
+    @Test
+    public void getLatestBooksTest() throws Exception {
+        for (int i = 0; i < 50; i++) {
+            addBookAPI(getPostRequestDto(), status().is2xxSuccessful());
+        }
+
+        List<BookResponseDto> bookResponseDtoList = objectMapper.readValue(getLatestOrManyReviewsBookAPI("/books/latest", status().is2xxSuccessful()).getContentAsString(),
+                objectMapper.getTypeFactory().constructCollectionType(List.class, BookResponseDto.class));
+
+
+        assertEquals(10, bookResponseDtoList.size());
+    }
+
+    @DisplayName("리뷰개수 많은 10개 조회 테스트")
+    @Test
+    public void getManyReviewsBooksTest() throws Exception {
+        for (int i = 0; i < 50; i++) {
+            addBookAPI(getPostRequestDto(), status().is2xxSuccessful());
+        }
+
+        List<BookResponseDto> bookResponseDtoList = objectMapper.readValue(getLatestOrManyReviewsBookAPI("/books/many-reviews", status().is2xxSuccessful()).getContentAsString(),
+                objectMapper.getTypeFactory().constructCollectionType(List.class, BookResponseDto.class));
+
+
+        assertEquals(10, bookResponseDtoList.size());
     }
 
 //    @DisplayName("책 대여 테스트")
@@ -288,6 +315,12 @@ public class BookApiTest {
                 .author("토비")
                 .publisher("토비 출판사")
                 .build();
+    }
+
+    private MockHttpServletResponse getLatestOrManyReviewsBookAPI(String url, ResultMatcher status) throws Exception {
+        return mockMvc.perform(get(url)
+                .contentType(APPLICATION_JSON)).andExpect(status)
+                .andReturn().getResponse();
     }
 
     private MockHttpServletResponse updateBookAPI(Long id, BookRequestDto.Put bookPutRequestDto, ResultMatcher status) throws Exception {
