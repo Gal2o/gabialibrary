@@ -1,6 +1,8 @@
 package gabia.library.dto;
 
+import gabia.library.domain.BookRequest;
 import gabia.library.domain.Status;
+import gabia.library.kafka.BookBuyingMessage;
 import gabia.library.kafka.BookRequestMessage;
 import gabia.library.utils.alert.AlertType;
 import lombok.AllArgsConstructor;
@@ -30,4 +32,21 @@ public class UserBookRequestDto {
                 .build();
     }
 
+    public BookBuyingMessage toBookBuyingMessage(BookRequest bookRequest) {
+
+        return BookBuyingMessage.builder()
+                .identifier(identifier)
+                .email(email)
+                .bookTitle(bookRequest.getBookName())
+                .bookAuthor(bookRequest.getAuthor())
+                .referenceUrl(bookRequest.getUrl())
+                .destination(bookRequest.getDestination().value())
+                .thumbnail(bookRequest.getThumbNail())
+                .publisher(bookRequest.getPublisher())
+                .publishDate(bookRequest.getPublishDate())
+                .requestState(Status.COMPLETED.value())
+                .alertType(AlertType.DISPLAY_COMPLETED)
+                .content(bookRequest.getContent())
+                .build();
+    }
 }

@@ -42,6 +42,11 @@ public class BookRequestDto {
     @Column(name = "is_deleted")
     private boolean isDeleted;
 
+    private String publisher;
+    private String publishDate;
+    private String thumbnail;
+    private String content;
+
     @Column(name = "created_date")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime createdDate;

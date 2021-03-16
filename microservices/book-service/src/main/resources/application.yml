@@ -14,11 +14,15 @@ kafka:
       name: book-rent-topic
     return:
       name: book-return-topic
+    buying:
+      name: book-buying-topic
   consumer:
     rent:
       groupName: book-rent-consumer-group
     return:
       groupName: book-return-consumer-group
+    buying:
+      groupName: book-buying-consumer-group
 
 logging:
   level:

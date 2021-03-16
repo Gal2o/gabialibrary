@@ -19,6 +19,9 @@ public class KafkaTopicConfig {
     @Value("${kafka.topic.request.name}")
     private String requestTopicName;
 
+    @Value("${kafka.topic.buying.name}")
+    private String buyingTopicName;
+
     @Bean
     public KafkaAdmin kafkaAdmin() {
         Map<String, Object> configs = new HashMap<>();
@@ -31,5 +34,8 @@ public class KafkaTopicConfig {
     public NewTopic bookRentTopic() {
         return new NewTopic(requestTopicName, 1, (short) 1);
     }
+
+    @Bean("bookBuyingTopic")
+    public NewTopic bookBuyingTopic() { return new NewTopic(buyingTopicName, 1, (short) 1); }
 
 }

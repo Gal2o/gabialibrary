@@ -1,6 +1,7 @@
 package gabia.library.domain;
 
 import gabia.library.config.BaseTimeEntity;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,7 +9,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 
+@Builder
 @EntityListeners(AuditingEntityListener.class)
+@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Entity
@@ -41,6 +44,18 @@ public class BookRequest extends BaseTimeEntity {
     @Column(name = "is_deleted", columnDefinition = "boolean default false", nullable = false)
     private boolean isDeleted;
 
+    @Column
+    private String thumbNail;
+
+    @Column
+    private String publisher;
+
+    @Column
+    private String publishDate;
+
+    @Lob
+    private String content;
+
     public void update() { this.status = Status.COMPLETED; }
 
     public void remove() {
@@ -48,13 +63,4 @@ public class BookRequest extends BaseTimeEntity {
         this.isDeleted = true;
     }
 
-    @Builder
-    public BookRequest(Long userId, String bookName, String author, Destination destination, String url, Status status) {
-        this.userId = userId;
-        this.bookName = bookName;
-        this.author = author;
-        this.destination = destination;
-        this.url = url;
-        this.status = status;
-    }
 }

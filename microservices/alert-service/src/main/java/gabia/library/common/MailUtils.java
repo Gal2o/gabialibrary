@@ -14,6 +14,7 @@ public class MailUtils {
     public final static String BOOK_RENT_ALERT_MAIL_TEMPLATES_PATH = "book-rent-alert-mail";
     public final static String BOOK_RETURN_ALERT_MAIL_TEMPLATES_PATH = "book-return-alert-mail";
     public final static String BOOK_REQUEST_ALERT_MAIL_TEMPLATES_PATH = "book-request-alert-mail";
+    public final static String BOOK_BUYING_ALERT_MAIL_TEMPLATES_PATH = "book-buying-alert-mail";
 
     public MimeMessage getMimeMessage(String toEmail, String alertTypeValue, String mailString, JavaMailSender javaMailSender) throws MessagingException {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();

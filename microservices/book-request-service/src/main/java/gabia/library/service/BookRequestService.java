@@ -7,6 +7,8 @@ import gabia.library.domain.Status;
 import gabia.library.dto.BookRequestDto;
 import gabia.library.dto.NaverBook;
 import gabia.library.dto.UserBookRequestDto;
+import gabia.library.exception.EntityNotFoundException;
+import gabia.library.kafka.sender.KafkaBookBuyingMessageSender;
 import gabia.library.kafka.sender.KafkaBookRequestMessageSender;
 import lombok.RequiredArgsConstructor;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -25,7 +27,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import javax.net.ssl.SSLContext;
-import javax.persistence.EntityNotFoundException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -48,6 +49,7 @@ public class BookRequestService {
     private final BookRequestRepository bookRequestRepository;
     private final RestTemplate restTemplate;
     private final KafkaBookRequestMessageSender kafkaBookRequestMessageSender;
+    private final KafkaBookBuyingMessageSender kafkaBookBuyingMessageSender;
 
     private final static String GET_USER_URL = USER_SERVICE_PREFIX + "/users/";
 
@@ -59,6 +61,11 @@ public class BookRequestService {
                 .destination(bookRequestDto.getDestination())
                 .url(bookRequestDto.getUrl())
                 .status(Status.REQUESTED)
+                .thumbNail(bookRequestDto.getThumbnail())
+                .publishDate(bookRequestDto.getPublishDate())
+                .publisher(bookRequestDto.getPublisher())
+                .content(bookRequestDto.getContent())
+                .isDeleted(false)
                 .build());
 
         UserBookRequestDto userBookRequestDto = getUserDtoById(bookRequestDto.getUserId()).getBody();
@@ -101,17 +108,26 @@ public class BookRequestService {
     }
 
     public BookRequestDto confirmBookRequest(Long id) {
-        //TODO: 예외 추가
-        BookRequest bookRequest = bookRequestRepository.findByIdAndIsDeleted(id, false).orElseThrow(() -> new EntityNotFoundException());
+        BookRequest bookRequest = bookRequestRepository.findByIdAndIsDeleted(id, false).orElseThrow(() -> new EntityNotFoundException(ENTITY_NOT_FOUND));
 
         bookRequest.update();
+
+        UserBookRequestDto userBookRequestDto = getUserDtoById(bookRequest.getUserId()).getBody();
+
+        if (isNull(userBookRequestDto)) {
+            throw new EntityNotFoundException(ENTITY_NOT_FOUND);
+        }
+
+        /**
+         * send buy book request event to kafka
+         */
+        kafkaBookBuyingMessageSender.send(userBookRequestDto.toBookBuyingMessage(bookRequest));
 
         return modelMapper.map(bookRequest, BookRequestDto.class);
     }
 
     public BookRequestDto cancelBookRequest(Long id) {
-        //TODO: 예외 추가
-        BookRequest bookRequest = bookRequestRepository.findByIdAndIsDeleted(id, false).orElseThrow(() -> new EntityNotFoundException());
+        BookRequest bookRequest = bookRequestRepository.findByIdAndIsDeleted(id, false).orElseThrow(() -> new EntityNotFoundException(ENTITY_NOT_FOUND));
 
         bookRequest.remove();
 

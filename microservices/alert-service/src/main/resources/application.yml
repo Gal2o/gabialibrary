@@ -29,6 +29,8 @@ kafka:
       name: book-return-topic
     request:
       name: book-request-topic
+    buying:
+      name: book-buying-topic
   consumer:
     rent:
       alert:
@@ -45,6 +47,11 @@ kafka:
         groupName: book-request-alert-group
       mail:
         groupName: book-request-mail-group
+    buying:
+      alert:
+        groupName: book-buying-alert-group
+      mail:
+        groupName: book-buying-mail-group
 
 logging:
   level:

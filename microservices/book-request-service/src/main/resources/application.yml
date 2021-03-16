@@ -29,6 +29,8 @@ kafka:
   topic:
     request:
       name: book-request-topic
+    buying:
+      name: book-buying-topic
 
 security:
   jwt:
