@@ -1,25 +1,8 @@
-server:
-  port: 8006
-
 spring:
+  profiles:
+    active: common
   application:
     name: alert-service
-  datasource:
-    url: jdbc:h2:~/alert-service
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    database: H2
-    hibernate:
-      ddl-auto: create-drop
-    show-sql: true
-
-  h2:
-    console:
-      enabled: true
-      path: /console
 
   mail:
     host: smtp.gmail.com
@@ -79,3 +62,31 @@ security:
     prefix: Bearer
     expiration: 86400 # 24*60*60
     secret: JwtSecretKey
+
+server:
+  port: 8006
+
+---
+spring:
+  profiles: dev
+  datasource:
+    url: jdbc:h2:~/alert-service
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    database: H2
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+  h2:
+    console:
+      enabled: true
+      path: /console
+
+---
+spring.profiles: release
+spring.profiles.include: real-db
+
+

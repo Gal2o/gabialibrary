@@ -6,21 +6,21 @@ import gabia.library.controller.UserController;
 import gabia.library.domain.User;
 import gabia.library.domain.UserRepository;
 import gabia.library.dto.UserDto;
-import org.junit.Assert;
+import gabia.library.exception.EntityNotFoundException;
 import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
+
+import static gabia.library.exception.message.CommonExceptionMessage.ENTITY_NOT_FOUND;
 
 @ActiveProfiles({ "test", "dev" })
 @RunWith(SpringRunner.class)
@@ -40,6 +40,11 @@ public class UserServiceTest {
     @Autowired
     ModelMapper modelMapper;
 
+    @AfterEach
+    public void after() {
+        userRepository.deleteAll();
+    }
+
     @Test
     public void 회원가입() throws Exception{
         // given
@@ -53,11 +58,11 @@ public class UserServiceTest {
                 .build();
 
         //when
-        userRepository.save(u1);
+        User user = userRepository.save(u1);
 
         //then
         ModelMapper mo = new ModelMapper();
-        Assertions.assertEquals(userService.findUser(1L).getUserName(), mo.map(u1, UserDto.class).getUserName(), "fail" );
+        Assertions.assertEquals(userService.findUser(user.getId()).getUserName(), mo.map(u1, UserDto.class).getUserName(), "fail" );
     }
 
     @Test
@@ -87,8 +92,8 @@ public class UserServiceTest {
         userRepository.save(u2);
 
         //then
-        Optional<User> r1 = userRepository.findById(3L);
-        Optional<User> r2 = userRepository.findById(4L);
+        Optional<User> r1 = userRepository.findById(1L);
+        Optional<User> r2 = userRepository.findById(2L);
 
         Assertions.assertEquals(u1.getUserName(), r1.get().getUserName(), "fail");
         Assertions.assertEquals(u2.getUserName(), r2.get().getUserName(), "fail");
@@ -118,7 +123,7 @@ public class UserServiceTest {
 
 
         //when
-        userRepository.save(u1);
+        u1 = userRepository.save(u1);
         UserDto userDto = modelMapper.map(u2, UserDto.class);
         u1.updateUser(userDto);
 
@@ -132,14 +137,22 @@ public class UserServiceTest {
     @JsonView(UserJsonView.Modify.class)
     public void 회원삭제() throws Exception{
         //given
-        Long count = userRepository.count();
+        User u1 = User.builder()
+                .authority("ROLE_USER")
+                .identifier("gabia")
+                .password("gabia")
+                .userName("Matt")
+                .email("aaa@naver.com")
+                .phone("010-1111-1111")
+                .build();
 
+        userRepository.save(u1);
+        User user = userRepository.findByIdentifier(u1.getIdentifier()).orElseThrow(() -> new EntityNotFoundException(ENTITY_NOT_FOUND));
         //when
-        userService.removeUser(1L);
-
-        //then
         Long result = userRepository.count();
 
-        Assertions.assertNotEquals(count, result, "false");
+        userService.removeUser(user.getId());
+
+        Assertions.assertEquals(result - 1, userRepository.count(), "false");
     }
 }
