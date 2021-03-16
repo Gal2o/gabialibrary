@@ -21,9 +21,6 @@ public class BookRequest extends BaseTimeEntity {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    @Column(name = "book_id")
-    private Long bookId;
-
     @Column(name = "book_name", nullable = false)
     private String bookName;
 

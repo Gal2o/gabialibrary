@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static gabia.library.config.CommonUrlPathPrefix.USER_SERVICE_PREFIX;
 import static gabia.library.exception.message.BookExceptionMessage.*;
 import static gabia.library.exception.message.CommonExceptionMessage.ENTITY_NOT_FOUND;
 import static java.util.Objects.isNull;
@@ -45,7 +46,7 @@ public class RentService {
 
     private static final int RENT_PAGE_SIZE = 10;
     private static final int RENT_SCALE_SIZE = 10;
-    private final static String GET_AUTH_USER_URL = "http://user-service/login?identifier=";
+    private final static String GET_AUTH_USER_URL = USER_SERVICE_PREFIX + "/login?identifier=";
 
     @Transactional
     public RentResponseDto rentBook(Long id, String identifier) {

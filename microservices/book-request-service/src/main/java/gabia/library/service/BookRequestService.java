@@ -6,6 +6,8 @@ import gabia.library.domain.BookRequestRepository;
 import gabia.library.domain.Status;
 import gabia.library.dto.BookRequestDto;
 import gabia.library.dto.NaverBook;
+import gabia.library.dto.UserBookRequestDto;
+import gabia.library.kafka.sender.KafkaBookRequestMessageSender;
 import lombok.RequiredArgsConstructor;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustStrategy;
@@ -14,6 +16,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +33,10 @@ import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static gabia.library.config.CommonUrlPathPrefix.USER_SERVICE_PREFIX;
+import static gabia.library.exception.message.CommonExceptionMessage.ENTITY_NOT_FOUND;
+import static java.util.Objects.isNull;
+
 @RequiredArgsConstructor
 @Transactional
 @Service
@@ -39,6 +46,10 @@ public class BookRequestService {
     private final NaverConfig naverConfig;
     private final ModelMapper modelMapper;
     private final BookRequestRepository bookRequestRepository;
+    private final RestTemplate restTemplate;
+    private final KafkaBookRequestMessageSender kafkaBookRequestMessageSender;
+
+    private final static String GET_USER_URL = USER_SERVICE_PREFIX + "/users/";
 
     public BookRequestDto addBookRequest(BookRequestDto bookRequestDto) {
         BookRequest bookRequest = bookRequestRepository.save(BookRequest.builder()
@@ -50,7 +61,22 @@ public class BookRequestService {
                 .status(Status.REQUESTED)
                 .build());
 
+        UserBookRequestDto userBookRequestDto = getUserDtoById(bookRequestDto.getUserId()).getBody();
+
+        if (isNull(userBookRequestDto)) {
+            throw new EntityNotFoundException(ENTITY_NOT_FOUND);
+        }
+
+        /**
+         * send return book request event to kafka
+         */
+        kafkaBookRequestMessageSender.send(userBookRequestDto.toBookRequestMessage(bookRequestDto));
+
         return modelMapper.map(bookRequest, BookRequestDto.class);
+    }
+
+    public ResponseEntity<UserBookRequestDto> getUserDtoById(Long id) {
+        return restTemplate.getForEntity(GET_USER_URL + id, UserBookRequestDto.class);
     }
 
     public NaverBook getBookByNaverApi(String title, Long page) throws NoSuchAlgorithmException,

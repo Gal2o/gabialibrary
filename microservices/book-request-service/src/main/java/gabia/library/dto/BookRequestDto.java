@@ -10,8 +10,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.Column;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import java.time.LocalDateTime;
 
 @Getter
@@ -19,15 +17,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class BookRequestDto {
 
-
     private Long id;
 
     @Column(name = "user_id")
     @JsonView({BookRequestJsonView.Request.class, BookRequestJsonView.Cancel.class})
     private Long userId;
-
-    @Column(name = "book_id")
-    private Long bookId;
 
     @Column(name = "book_name")
     @JsonView({BookRequestJsonView.List.class, BookRequestJsonView.Request.class, BookRequestJsonView.Cancel.class})

@@ -24,6 +24,12 @@ ribbon:
   eureka:
     enabled: true
 
+kafka:
+  bootstrapServers: 52.78.142.57:9092
+  topic:
+    request:
+      name: book-request-topic
+
 security:
   jwt:
     uri: /auth/**
