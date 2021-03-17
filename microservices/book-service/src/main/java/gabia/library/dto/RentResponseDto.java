@@ -3,6 +3,8 @@ package gabia.library.dto;
 import gabia.library.domain.rent.RentStatus;
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Setter
 @Getter
 @Builder
@@ -21,5 +23,7 @@ public class RentResponseDto {
     private String identifier;
 
     private RentStatus rentStatus;
+
+    private LocalDate rentExpiredDate;
 
 }

@@ -144,4 +144,8 @@ public class RentService {
         return restTemplate.getForEntity(GET_AUTH_USER_URL + identifier, UserEmailDto.class);
     }
 
+    public List<RentResponseDto> getAllRentListOfUser(String identifier) {
+
+        return rentRepository.findAllByIdentifier(identifier).stream().map(RentMapper.INSTANCE::rentToRentResponseDto).collect(Collectors.toList());
+    }
 }

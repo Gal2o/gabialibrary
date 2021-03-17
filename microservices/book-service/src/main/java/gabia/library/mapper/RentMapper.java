@@ -18,6 +18,7 @@ public interface RentMapper {
     @Mapping(source = "bookAuthor", target = "bookAuthor")
     @Mapping(source = "identifier", target = "identifier")
     @Mapping(source = "rentStatus", target = "rentStatus")
+    @Mapping(source = "rentExpiredDate", target = "rentExpiredDate")
     RentResponseDto rentToRentResponseDto(Rent rent);
 
     @Mapping(source = "id", target = "bookId")
