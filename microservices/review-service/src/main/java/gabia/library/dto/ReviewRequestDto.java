@@ -1,6 +1,8 @@
 package gabia.library.dto;
 
 import gabia.library.domain.Review;
+import gabia.library.kafka.status.ReviewStatus;
+import gabia.library.kafka.message.ReviewCreateMessage;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -38,6 +40,18 @@ public class ReviewRequestDto {
                     .rating(this.rating)
                     .content(this.content)
                     .isDeleted(false)
+                    .build();
+        }
+
+        public ReviewCreateMessage toReviewCreateMessage(Long bookId, String identifier) {
+
+            return ReviewCreateMessage.builder()
+                    .bookId(bookId)
+                    .identifier(identifier)
+                    .reviewTitle(this.title)
+                    .reviewRating(this.rating)
+                    .reviewContent(this.content)
+                    .reviewStatus(ReviewStatus.PENDING)
                     .build();
         }
     }

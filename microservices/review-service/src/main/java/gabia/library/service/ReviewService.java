@@ -7,15 +7,14 @@ import gabia.library.domain.ReviewRepository;
 import gabia.library.dto.BookRequestDto;
 import gabia.library.dto.ReviewRequestDto;
 import gabia.library.dto.ReviewResponseDto;
-import gabia.library.exception.EntityNotFoundException;
-import gabia.library.exception.InvalidPageValueException;
-import gabia.library.exception.InvalidReviewIdentifierException;
-import gabia.library.exception.RestTemplateResponseBodyException;
+import gabia.library.exception.*;
+import gabia.library.kafka.sender.KafkaReviewCreateMessageSender;
 import gabia.library.mapper.ReviewMapper;
 import gabia.library.utils.jwt.JwtUtils;
 import gabia.library.utils.page.PageUtils;
 import gabia.library.utils.page.PagingResponseDto;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpEntity;
@@ -31,9 +30,8 @@ import java.util.stream.Collectors;
 import static gabia.library.config.CommonUrlPathPrefix.BOOK_SERVICE_PREFIX;
 import static gabia.library.exception.message.CommonExceptionMessage.*;
 import static gabia.library.exception.message.ReviewExceptionMessage.INVALID_REVIEW_IDENTIFIER;
-import static java.util.Objects.isNull;
 
-
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class ReviewService {
@@ -44,6 +42,7 @@ public class ReviewService {
     private final RestTemplate restTemplate;
     private final JwtUtils jwtUtils;
     private final PageUtils pageUtils;
+    private final KafkaReviewCreateMessageSender kafkaReviewCreateMessageSender;
 
     private static final int REVIEWS_OF_USER_PAGE = 10;
     private static final int REVIEW_OF_USER_SCALE_SIZE = 10;
@@ -51,22 +50,14 @@ public class ReviewService {
     private static final int REVIEW_OF_BOOK_SCALE_SIZE = 10;
 
     @Transactional
-    public ReviewResponseDto.Add addReview(Long bookId, ReviewRequestDto.Post reviewRequestDto, String jwt) {
-        HttpEntity<BookRequestDto> entity = new HttpEntity<>(BookRequestDto.builder().rating(reviewRequestDto.getRating()).build(),
-                jwtUtils.getHttpHeadersIncludedJwt(jwt));
+    public ReviewResponseDto.Add addReview(Long bookId, ReviewRequestDto.Post reviewRequestDto, String identifier) {
 
-        ResponseEntity<ReviewResponseDto.Add> reviewResponse
-                = restTemplate.exchange(REVIEW_IN_BOOK_URL + bookId + "/reviews", HttpMethod.POST, entity, ReviewResponseDto.Add.class);
+        /**
+         * send to add review message to kafka
+         */
+        kafkaReviewCreateMessageSender.send(reviewRequestDto.toReviewCreateMessage(bookId, identifier));
 
-        ReviewResponseDto.Add reviewResponseDto = reviewResponse.getBody();
-
-        if (isNull(reviewResponseDto)) {
-            throw new RestTemplateResponseBodyException(INVALID_REST_TEMPLATE_RESPONSE_BODY);
-        }
-
-        reviewRepository.save(reviewRequestDto.toEntity(bookId, reviewResponseDto.getIdentifier()));
-
-        return reviewResponseDto;
+        return ReviewMapper.INSTANCE.reviewRequestDtoToResponseDto(reviewRequestDto);
     }
 
     public PagingResponseDto getReviewsOfUser(String identifier, Integer page) {

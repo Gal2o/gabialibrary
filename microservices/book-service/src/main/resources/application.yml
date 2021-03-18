@@ -16,6 +16,12 @@ kafka:
       name: book-return-topic
     buying:
       name: book-buying-topic
+    review:
+      update:
+        name: review-update-of-book-topic
+        result:
+          name: review-create-result-topic
+
   consumer:
     rent:
       groupName: book-rent-consumer-group
@@ -23,6 +29,9 @@ kafka:
       groupName: book-return-consumer-group
     buying:
       groupName: book-buying-consumer-group
+    review:
+      update:
+        groupName: review-update-of-book-consumer
 
 logging:
   level:

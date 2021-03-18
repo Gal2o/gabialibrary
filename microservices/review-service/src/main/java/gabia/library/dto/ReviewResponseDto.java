@@ -13,11 +13,11 @@ public class ReviewResponseDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class Add {
-        private String identifier;
+        private String title;
 
-        private Double avgReviewRating;
+        private Integer rating;
 
-        private Integer reviewCount;
+        private String content;
     }
 
     @Setter

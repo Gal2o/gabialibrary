@@ -1,10 +1,9 @@
 package gabia.library.domain;
 
 import gabia.library.dto.ReviewRequestDto;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import gabia.library.kafka.status.ReviewStatus;
+import gabia.library.kafka.ReviewUpdateOfBookMessage;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -13,8 +12,10 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @ToString
+@Builder
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @Entity
 public class Review {
@@ -41,21 +42,14 @@ public class Review {
     @Column(columnDefinition = "boolean default false", nullable = false)
     private boolean isDeleted;
 
+    @Enumerated(EnumType.STRING)
+    private ReviewStatus reviewStatus;
+
     @CreatedDate
     private LocalDateTime createdDate;
 
     @LastModifiedDate
     private LocalDateTime modifiedDate;
-
-    @Builder
-    public Review(Long bookId, String identifier, String title, Integer rating, String content, boolean isDeleted) {
-        this.bookId = bookId;
-        this.identifier = identifier;
-        this.title = title;
-        this.rating = rating;
-        this.content = content;
-        this.isDeleted = isDeleted;
-    }
 
     public void update(ReviewRequestDto.Put reviewRequestDto) {
         this.title = reviewRequestDto.getTitle();
@@ -64,5 +58,21 @@ public class Review {
 
     public void delete() {
         this.isDeleted = true;
+    }
+
+    public ReviewUpdateOfBookMessage toReviewUpdateOfBookMessage() {
+
+        return ReviewUpdateOfBookMessage.builder()
+                .reviewId(this.id)
+                .bookId(this.bookId)
+                .reviewRating(this.rating)
+                .build();
+    }
+
+    public void updateReviewStatus(ReviewStatus reviewStatus) {
+        this.reviewStatus = reviewStatus;
+        if (reviewStatus == ReviewStatus.COMPLETED) {
+            this.isDeleted = false;
+        }
     }
 }

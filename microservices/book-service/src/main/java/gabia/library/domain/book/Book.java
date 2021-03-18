@@ -7,6 +7,7 @@ import gabia.library.dto.ReviewRequestDto;
 import gabia.library.dto.ReviewResponseDto;
 import gabia.library.kafka.BookRentMessage;
 import gabia.library.kafka.BookReturnMessage;
+import gabia.library.kafka.ReviewUpdateOfBookMessage;
 import gabia.library.utils.alert.AlertType;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -17,7 +18,6 @@ import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import static java.lang.Math.round;
 import static java.util.Objects.isNull;
 
 @ToString
@@ -135,11 +135,11 @@ public class Book {
         this.rentExpiredDate = null;
     }
 
-    public void addReviewRating(ReviewRequestDto reviewRequestDto) {
+    public void addReviewRating(ReviewUpdateOfBookMessage message) {
         if(isNull(this.totalRating)) {
             this.totalRating = 0;
         }
-        this.totalRating = this.totalRating + reviewRequestDto.getRating();
+        this.totalRating = this.totalRating + message.getReviewRating();
         this.reviewCount++;
     }
 

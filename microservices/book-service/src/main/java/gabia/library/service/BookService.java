@@ -87,15 +87,6 @@ public class BookService {
     }
 
     @Transactional
-    public ReviewResponseDto addReviewRating(Long bookId, ReviewRequestDto reviewRequestDto, String reviewIdentifier) {
-        Book book = bookRepository.findByIdAndIsDeleted(bookId, false).orElseThrow(() -> new EntityNotFoundException(ENTITY_NOT_FOUND));
-
-        book.addReviewRating(reviewRequestDto);
-
-        return book.toReviewResponseDto(reviewIdentifier);
-    }
-
-    @Transactional
     public ReviewResponseDto deleteReview(Long id, ReviewRequestDto reviewRequestDto, String identifier) {
         Book book = bookRepository.findByIdAndIsDeleted(id, false).orElseThrow(() -> new EntityNotFoundException(ENTITY_NOT_FOUND));
 

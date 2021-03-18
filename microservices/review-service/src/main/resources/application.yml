@@ -27,6 +27,22 @@ book-service:
     MaxAutoRetries: 0
     MaxAutoRetriesNextServer: 1
 
+kafka:
+  bootstrapServers: 52.78.142.57:9092
+  topic:
+    create:
+      name: review-create-topic
+      result:
+        name: review-create-result-topic
+    update:
+      name: review-update-of-book-topic
+
+  consumer:
+    create:
+      groupName: review-create-consumer-group
+      result:
+        groupName: review-create-result-consumer-group
+
 security:
   jwt:
     uri: /auth/**

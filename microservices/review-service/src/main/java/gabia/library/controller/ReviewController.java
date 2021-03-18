@@ -25,11 +25,11 @@ public class ReviewController {
 
     @PostMapping("/books/{id}/reviews")
     public ResponseEntity<ReviewResponseDto.Add> addReview(@PathVariable("id") Long bookId, @RequestBody @Valid ReviewRequestDto.Post reviewRequestDto, HttpServletRequest request)
-            throws AccessDeniedException, JsonProcessingException {
+            throws AccessDeniedException {
 
         String jwt = jwtUtils.getJwtFromRequest(request);
 
-        return ResponseEntity.ok(reviewService.addReview(bookId, reviewRequestDto, jwt));
+        return ResponseEntity.ok(reviewService.addReview(bookId, reviewRequestDto, jwtUtils.getIdentifierFromJwt(jwt)));
     }
 
     @GetMapping("/books/reviews")

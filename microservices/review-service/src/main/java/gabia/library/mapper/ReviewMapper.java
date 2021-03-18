@@ -1,6 +1,7 @@
 package gabia.library.mapper;
 
 import gabia.library.domain.Review;
+import gabia.library.dto.ReviewRequestDto;
 import gabia.library.dto.ReviewResponseDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -30,4 +31,8 @@ public interface ReviewMapper {
     @Mapping(source = "modifiedDate", target = "modifiedDate")
     ReviewResponseDto.Details reviewToReviewDetailsResponseDto(Review review);
 
+    @Mapping(source = "title", target = "title")
+    @Mapping(source = "rating", target = "rating")
+    @Mapping(source = "content", target = "content")
+    ReviewResponseDto.Add reviewRequestDtoToResponseDto(ReviewRequestDto.Post reviewRequestDto);
 }

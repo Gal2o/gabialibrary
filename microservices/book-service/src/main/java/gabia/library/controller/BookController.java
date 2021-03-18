@@ -88,14 +88,6 @@ public class BookController {
         return ResponseEntity.ok(rentService.getAllRentListOfUser(jwtUtils.getIdentifierFromJwt(jwt)));
     }
 
-    @PostMapping("/books/{id}/reviews")
-    public ResponseEntity<ReviewResponseDto> addReviewRating(@PathVariable("id") Long bookId, @RequestBody ReviewRequestDto reviewRequestDto,
-                                                             HttpServletRequest request) throws AccessDeniedException {
-        String jwt = jwtUtils.getJwtFromRequest(request);
-
-        return ResponseEntity.ok(bookService.addReviewRating(bookId, reviewRequestDto, jwtUtils.getIdentifierFromJwt(jwt)));
-    }
-
     @PutMapping("/books/{id}/reviews")
     public ResponseEntity<ReviewResponseDto> deleteReview(@PathVariable("id") Long id, @RequestBody ReviewRequestDto reviewRequestDto,
                                                           HttpServletRequest request) throws AccessDeniedException {
