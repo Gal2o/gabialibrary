@@ -6,6 +6,7 @@ import gabia.library.config.MockMvcTest;
 import gabia.library.dto.BookRequestDto;
 import gabia.library.dto.BookResponseDto;
 import gabia.library.exception.ErrorResponse;
+import gabia.library.utils.page.PagingResponseDto;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.junit.jupiter.api.BeforeEach;
@@ -156,10 +157,11 @@ public class BookApiTest {
             addBookAPI(getPostRequestDto(), status().is2xxSuccessful());
         }
 
-        List<BookResponseDto> bookResponseDtoList = objectMapper.readValue(getSearchedBookAPI(1, "스프", status().is2xxSuccessful()).getContentAsString(),
-                objectMapper.getTypeFactory().constructCollectionType(List.class, BookResponseDto.class));
+        PagingResponseDto responseDto = objectMapper.readValue(getSearchedBookAPI(1, "스프", status().is2xxSuccessful()).getContentAsString(), PagingResponseDto.class);
 
-        assertEquals(12, bookResponseDtoList.size());
+        assertEquals(1, responseDto.getPageResponseData().getPage());
+        assertEquals(5, responseDto.getPageResponseData().getTotalPage());
+        assertEquals(12, responseDto.getResponseDtoList().size());
     }
 
 //    @DisplayName("책 대여 테스트")

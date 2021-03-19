@@ -109,7 +109,7 @@ public class BookController {
     }
 
     @GetMapping("/books/search")
-    public ResponseEntity<?> getSearchedBooks(@RequestParam(value = "keyword") String keyword, @RequestParam(value = "page", required = false) Integer page) {
+    public ResponseEntity<PagingResponseDto> getSearchedBooks(@RequestParam(value = "keyword") String keyword, @RequestParam(value = "page", required = false) Integer page) {
 
         return ResponseEntity.ok(bookService.getSearchedBooks(keyword, page));
     }

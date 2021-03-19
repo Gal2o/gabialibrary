@@ -107,6 +107,12 @@ public class BookService {
         return books.stream().map(BookMapper.INSTANCE::bookToBookResponseDto).collect(Collectors.toList());
     }
 
+    public PagingResponseDto getSearchedBooks(String keyword, Integer page) {
+        Page<Book> bookPage = bookRepository.findByTitleIsContaining(keyword, pageUtils.getPageable(page, BOOK_PAGE_SIZE, Sort.Direction.DESC, "createdDate"));
+
+        return pageUtils.getCommonPagingResponseDto(bookPage, getBookResponseDtoList(bookPage), BOOK_SCALE_SIZE);
+    }
+
     private List<BookResponseDto> getBookResponseDtoList(Page<Book> bookPage) {
         return bookPage.stream().map(book -> {
             BookResponseDto bookResponseDto = BookMapper.INSTANCE.bookToBookResponseDto(book);
@@ -116,14 +122,4 @@ public class BookService {
         }).collect(Collectors.toList());
     }
 
-    public List<BookResponseDto> getSearchedBooks(String keyword, Integer page) {
-        Page<Book> bookPage = bookRepository.findByTitleIsContaining(keyword, pageUtils.getPageable(page, BOOK_PAGE_SIZE, Sort.Direction.DESC, "createdDate"));
-
-        return bookPage.stream().map(book -> {
-            BookResponseDto bookResponseDto = BookMapper.INSTANCE.bookToBookResponseDto(book);
-            bookResponseDto.setAvgReviewRating(Double.parseDouble(book.calcAvgReviewRating()));
-
-            return bookResponseDto;
-        }).collect(Collectors.toList());
-    }
 }
