@@ -149,6 +149,19 @@ public class BookApiTest {
         assertEquals(10, bookResponseDtoList.size());
     }
 
+    @DisplayName("책 검색 테스트")
+    @Test
+    public void getSearchedBookTest() throws Exception {
+        for (int i = 0; i < 50; i++) {
+            addBookAPI(getPostRequestDto(), status().is2xxSuccessful());
+        }
+
+        List<BookResponseDto> bookResponseDtoList = objectMapper.readValue(getSearchedBookAPI(1, "스프", status().is2xxSuccessful()).getContentAsString(),
+                objectMapper.getTypeFactory().constructCollectionType(List.class, BookResponseDto.class));
+
+        assertEquals(12, bookResponseDtoList.size());
+    }
+
 //    @DisplayName("책 대여 테스트")
 //    @Test
 //    public void rentBookTest() throws Exception {
@@ -332,6 +345,13 @@ public class BookApiTest {
 
     private MockHttpServletResponse deleteBookAPI(Long id, ResultMatcher status) throws Exception {
         return mockMvc.perform(delete("/books/" + id)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status)
+                .andReturn().getResponse();
+    }
+
+    private MockHttpServletResponse getSearchedBookAPI(int page, String keyword, ResultMatcher status) throws Exception {
+        return mockMvc.perform(get("/books/search?page=" + page + "&keyword=" + keyword)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status)
                 .andReturn().getResponse();

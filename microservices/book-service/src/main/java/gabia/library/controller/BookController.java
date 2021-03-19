@@ -103,9 +103,15 @@ public class BookController {
     }
 
     @GetMapping("/books/many-reviews")
-    public ResponseEntity<?> getManyReviewsBooks() {
+    public ResponseEntity<List<BookResponseDto>> getManyReviewsBooks() {
 
         return ResponseEntity.ok(bookService.getManyReviewsBooks());
+    }
+
+    @GetMapping("/books/search")
+    public ResponseEntity<?> getSearchedBooks(@RequestParam(value = "keyword") String keyword, @RequestParam(value = "page", required = false) Integer page) {
+
+        return ResponseEntity.ok(bookService.getSearchedBooks(keyword, page));
     }
 
 }

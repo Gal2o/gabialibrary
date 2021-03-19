@@ -28,7 +28,7 @@ book-service:
     MaxAutoRetriesNextServer: 1
 
 kafka:
-  bootstrapServers: 52.78.142.57:9092
+  bootstrapServers: 127.0.0.1:9092
   topic:
     create:
       name: review-create-topic

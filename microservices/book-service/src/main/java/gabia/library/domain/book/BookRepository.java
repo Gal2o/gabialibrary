@@ -15,4 +15,7 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     List<Book> findTop10ByOrderByCreatedDateDesc();
 
     List<Book> findTop10ByOrderByReviewCountDesc();
+
+    Page<Book> findByTitleIsContaining(String keyword, Pageable createdDate);
+
 }

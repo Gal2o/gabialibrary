@@ -25,7 +25,7 @@ ribbon:
     enabled: true
 
 kafka:
-  bootstrapServers: 52.78.142.57:9092
+  bootstrapServers: 127.0.0.1:9092
   topic:
     request:
       name: book-request-topic

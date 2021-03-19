@@ -116,4 +116,14 @@ public class BookService {
         }).collect(Collectors.toList());
     }
 
+    public List<BookResponseDto> getSearchedBooks(String keyword, Integer page) {
+        Page<Book> bookPage = bookRepository.findByTitleIsContaining(keyword, pageUtils.getPageable(page, BOOK_PAGE_SIZE, Sort.Direction.DESC, "createdDate"));
+
+        return bookPage.stream().map(book -> {
+            BookResponseDto bookResponseDto = BookMapper.INSTANCE.bookToBookResponseDto(book);
+            bookResponseDto.setAvgReviewRating(Double.parseDouble(book.calcAvgReviewRating()));
+
+            return bookResponseDto;
+        }).collect(Collectors.toList());
+    }
 }
